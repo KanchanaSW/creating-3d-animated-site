@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/* The agent writes six hexes into src/config/site.ts. App.tsx sets them here as
+   --c-*. Everything else on the page is derived from those six. */
+:root {
+  --c-background: #0b0a0f;
+  --c-foreground: #f4f1ea;
+  --c-primary: #e8b96a;
+  --c-secondary: #b4763c;
+  --c-accent: #9fc3ff;
+  --c-muted: #191620;
+
+  --site-background: var(--c-background);
+  --site-foreground: var(--c-foreground);
+}
+
+@theme {
+  --color-background: var(--site-background);
+  --color-foreground: var(--site-foreground);
+  --color-primary: var(--c-primary);
+  --color-secondary: var(--c-secondary);
+  --color-accent: var(--c-accent);
+  --color-muted: var(--c-muted);
+
+  --color-surface: color-mix(in oklab, var(--site-background) 91%, var(--site-foreground));
+  --color-raised: color-mix(in oklab, var(--site-background) 85%, var(--site-foreground));
+  --color-hairline: color-mix(in oklab, var(--site-background) 78%, var(--site-foreground));
+
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Geist", "Inter", "Helvetica Neue", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+
+  --text-display: clamp(3rem, 9vw, 8rem);
+  --text-display--line-height: 0.92;
+  --text-display--letter-spacing: -0.035em;
+  --text-statement: clamp(2.25rem, 5.2vw, 4.5rem);
+  --text-statement--line-height: 1.02;
+  --text-statement--letter-spacing: -0.025em;
+  --text-heading: clamp(1.75rem, 3.2vw, 3rem);
+  --text-heading--line-height: 1.08;
+  --text-heading--letter-spacing: -0.02em;
+  --text-sub: clamp(1.05rem, 1.5vw, 1.375rem);
+  --text-sub--line-height: 1.5;
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.2;
+  --text-micro--letter-spacing: 0.18em;
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-tone="inverse"] {
+  --site-background: var(--c-foreground);
+  --site-foreground: var(--c-background);
+
+  --color-background: var(--site-background);
+  --color-foreground: var(--site-foreground);
+  --color-surface: color-mix(in oklab, var(--site-background) 91%, var(--site-foreground));
+  --color-raised: color-mix(in oklab, var(--site-background) 85%, var(--site-foreground));
+  --color-hairline: color-mix(in oklab, var(--site-background) 78%, var(--site-foreground));
+  --color-primary: color-mix(in oklab, var(--c-primary) 72%, var(--site-foreground));
+  --color-accent: color-mix(in oklab, var(--c-accent) 72%, var(--site-foreground));
+
+  background-color: var(--site-background);
+  color: var(--site-foreground);
+}
+
+html,
+body,
+#root {
+  background: var(--c-background);
+  color: var(--c-foreground);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--c-primary);
+  color: var(--c-background);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 15% 0%, color-mix(in oklab, var(--color-primary) 20%, transparent), transparent 70%),
+    radial-gradient(45% 50% at 95% 30%, color-mix(in oklab, var(--color-accent) 16%, transparent), transparent 70%);
+}
+
+.mask-line {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

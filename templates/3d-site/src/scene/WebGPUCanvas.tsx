@@ -27,7 +27,7 @@ export function WebGPUCanvas() {
         gl={createWebGpuRenderer}
         dpr={lite ? 1 : [1, 1.75]}
         frameloop={reduced ? 'never' : 'always'}
-        camera={{ position: [0, 0.35, 5.2], fov: 42, far: 24 }}
+        camera={{ position: [0, 0.92, 3.65], fov: 36, far: 32, near: 0.1 }}
       >
         <PaintOnce enabled={reduced} />
         <Scene reduced={reduced} lite={lite} />

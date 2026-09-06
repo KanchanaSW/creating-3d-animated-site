@@ -13,11 +13,11 @@ export function Hero() {
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/80 via-background/15 to-transparent"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/42 via-background/6 to-transparent"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/55 via-background/10 to-transparent"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/38 via-background/6 to-transparent"
       />
       <div aria-hidden className="glow opacity-70" />
 

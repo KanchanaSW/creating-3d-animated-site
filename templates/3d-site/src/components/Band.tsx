@@ -3,8 +3,8 @@ import { useGsapReveal } from '../lib/useGsapReveal'
 import type { SectionTone } from '../types/site'
 
 const toneClass: Record<SectionTone, string> = {
-  base: 'bg-background/25',
-  surface: 'border-y border-hairline bg-surface/80 backdrop-blur-[2px]',
+  base: 'bg-background/16',
+  surface: 'border-y border-hairline bg-surface/52 backdrop-blur-[1px]',
   inverse: '',
 }
 

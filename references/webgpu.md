@@ -26,7 +26,7 @@ Never `ShaderMaterial`, never a GLSL `vertexShader` / `fragmentShader` string. G
 The only constructor lives in `src/scene/createWebGpuRenderer.ts`:
 
 ```ts
-import { WebGPURenderer } from 'three/webgpu'
+import { ACESFilmicToneMapping, WebGPURenderer } from 'three/webgpu'
 
 export async function createWebGpuRenderer(props: object) {
   const renderer = new WebGPURenderer({
@@ -36,6 +36,8 @@ export async function createWebGpuRenderer(props: object) {
     powerPreference: 'high-performance',
   })
   await renderer.init()
+  renderer.toneMapping = ACESFilmicToneMapping
+  renderer.toneMappingExposure = 1.12
   return renderer
 }
 ```
@@ -57,7 +59,7 @@ Do this in `WebGPUCanvas.tsx` only.
   gl={createWebGpuRenderer}
   dpr={isMobile ? 1 : [1, 1.75]}
   frameloop={reduced ? 'never' : 'always'}
-  camera={{ position: [0, 0.35, 5.2], fov: 42, far: 24 }}
+  camera={{ position: [0, 0.92, 3.65], fov: 36, far: 32 }}
 >
 ```
 
@@ -76,3 +78,6 @@ Do this in `WebGPUCanvas.tsx` only.
 - `OrbitControls` from addons
 - `WebGLRenderer` imported beside `WebGPURenderer`
 - Postprocessing stacks that assume the WebGL composer
+- Deleting `StudioEnvironment` because "WebGPU has no Environment"
+
+The scene uses `scene.environmentNode` (TSL) for IBL. That is the WebGPU-native path. See [realism.md](realism.md).

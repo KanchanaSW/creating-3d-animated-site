@@ -30,7 +30,7 @@ export function About() {
 
         <div
           data-reveal
-          className="relative min-h-[420px] overflow-hidden rounded-[2rem] border border-hairline bg-background/10 sm:min-h-[560px]"
+          className="relative min-h-[420px] overflow-hidden rounded-[2rem] border border-hairline bg-transparent sm:min-h-[560px]"
         >
           <div
             aria-hidden

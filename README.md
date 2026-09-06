@@ -48,6 +48,7 @@ SKILL.md                         inputs, workflow, hard rules
 references/content-schema.md     SiteConfig types and field rules
 references/color-system.md       hex parsing + nine mood palettes + contrast floors
 references/visual-system.md      band tones, type scale, derived surfaces, 3D peeking
+references/realism.md            studio photograph contract (floor, IBL, still life)
 references/section-recipes.md    copy lengths, nav, section ids
 references/animations.md         Lenis, Motion, GSAP roles (HTML only)
 references/webgpu.md             renderer init, import paths, fallback
@@ -76,7 +77,7 @@ One WebGPU canvas, full viewport, fixed behind the page. Scroll drives camera ke
 | Testimonials | `inverse` | the palette flips — a light band on a dark page |
 | CTA | `base` | `primary` → `secondary` gradient panel with an `accent` bloom |
 
-You supply six hexes and a recipe (`orb`, `lattice`, `field`, `ribbon`, `terrain`). Palettes are validated before generation:
+You supply six hexes and a recipe (`orb`, `lattice`, `field`, `ribbon`, `terrain`). The canvas is a studio still life (ground, cyclorama, TSL IBL, physical materials) — not a primitive in a void. Palettes are validated before generation:
 
 ```bash
 node scripts/check-palette.mjs '#0B0A0F' '#F4F1EA' '#E8B96A' '#B4763C' '#9FC3FF' '#191620'
@@ -95,7 +96,7 @@ No photographs. The scene is procedural. For `prefers-reduced-motion`, Lenis and
 
 ## After install
 
-Restart Cursor / start a new Claude Code session so the skill is in the catalog. Give a title and ask to scaffold a 3D animated site. The agent should read `SKILL.md`, then `references/visual-system.md`, `references/content-schema.md`, `references/scene.md`, and `references/webgpu.md`, before writing config.
+Restart Cursor / start a new Claude Code session so the skill is in the catalog. Give a title and ask to scaffold a 3D animated site. The agent should read `SKILL.md`, then `references/visual-system.md`, `references/content-schema.md`, `references/scene.md`, `references/realism.md`, and `references/webgpu.md`, before writing config.
 
 ## Credits
 

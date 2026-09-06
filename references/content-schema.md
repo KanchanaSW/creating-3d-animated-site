@@ -13,7 +13,7 @@ Import `SiteConfig` from `src/types/site.ts`. The generated `siteConfig` object 
 | `title` | Site name. Also used for `index.html` and `document.title`. |
 | `tagline` | Short supporting line (6–12 words). |
 | `colors` | All six hex keys: `background`, `foreground`, `primary`, `secondary`, `accent`, `muted`. |
-| `scene.recipe` | One of `orb`, `lattice`, `field`, `ribbon`, `terrain`. See [scene.md](scene.md). |
+| `scene.recipe` | One of `orb`, `lattice`, `field`, `ribbon`, `terrain`. See [scene.md](scene.md) and [realism.md](realism.md). |
 | `nav` | Hash links only. Hrefs must match section ids. |
 | `hero` | Eyebrow, headline, subheadline, primary CTA. `secondaryCta` is optional. No image. |
 | `about` | `id` must be `about`. Include body and stats. `tone: 'base'`. No image. |

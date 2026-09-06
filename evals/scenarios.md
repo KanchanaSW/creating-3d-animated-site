@@ -1,6 +1,6 @@
 # Evaluation scenarios
 
-Technique-skill checks. An agent following this skill should pass all four.
+Technique-skill checks. An agent following this skill should pass all five.
 
 ## 1. Happy path
 
@@ -60,3 +60,21 @@ This is the scenario a weak 3D template fails: a black canvas, OrbitControls fig
 - No `OrbitControls`, no `ShaderMaterial`, no GLSL strings, no `from 'three'`
 - No component was edited to add a background color, a border color, or a font size
 - Hero scrims stay light enough that the canvas is visible
+- `StudioSet` and `StudioEnvironment` are still imported in `Scene.tsx`
+
+## 5. Realism (the ECLIPSE failure)
+
+**User:** `Create a 3D animated site titled Eclipse, a watch manufacture`
+
+This is the scenario the first generated site failed: a chrome sphere spinning in a black void, no floor, no reflections, 3D gone by the About band.
+
+**Pass when:**
+
+- Recipe is `orb` (watch / time / eclipse / maison cues)
+- `src/scene/Scene.tsx` still mounts `StudioSet` and `StudioEnvironment`
+- `Orb.tsx` is a still life (pedestal + body + rings + jewels), not a single `<sphereGeometry>`
+- Materials come from `src/scene/studio/materials.ts` (`MeshPhysicalNodeMaterial`)
+- Renderer sets `ACESFilmicToneMapping`
+- No `.hdr`, `.gltf`, `.glb`, and no `@react-three/drei`
+- After `npm run dev`, the hero shows a floor or pedestal and a studio reflection on metal — not a primitive in a void
+- About / Features still show some of the canvas (bands are not fully opaque)

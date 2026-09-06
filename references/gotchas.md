@@ -19,7 +19,12 @@ When the canvas is black, the scroll fights the mouse, or the scene ignores the 
 | Inverse band unreadable | Inverse left translucent | Inverse stays near-opaque. Quotes are HTML, not 3D. |
 | Jank on phone | DPR 2 + full instance counts | `dpr={1}` below 768px; lite counts in recipes. |
 | Reduced-motion users get a spinning sphere | `frameloop` left on `always` | `never` after one still frame. |
-| Added `drei` for `Environment` | HDRI download + extra RAF helpers | Remove drei. Procedural lights only. |
+| Added `drei` for `Environment` | HDRI download + extra RAF helpers | Remove drei. `StudioEnvironment` is the IBL. |
+| Chrome sphere in a black void | Studio set deleted, or recipe collapsed to one primitive | Restore `StudioSet` + `StudioEnvironment`. Re-read [realism.md](realism.md). |
+| Metal looks like flat plastic | No `environmentNode`, or `MeshStandardNodeMaterial` with only `colorNode` | Keep TSL IBL and `materials.ts` physical presets. |
+| Subject floats | Floor / contact shadow removed | Put `StudioSet` back. |
+| Scene vanishes after the hero | Band wash too opaque (`bg-background/80`, `bg-surface/80`) | Base stays `bg-background/16`. Surface stays `bg-surface/52`. |
+| Still life is a speck | Camera pulled back past `z ≈ 6.2` | Restore the pose table in `useScrollCamera.ts`. |
 | Copied a Three.js example that uses `WebGLRenderer` | Wrong renderer family | Stay on `createWebGpuRenderer`. |
 
 **All of these mean: the canvas is wrong. Re-read [webgpu.md](webgpu.md) and [scene.md](scene.md); do not patch around them.**

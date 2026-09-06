@@ -1,6 +1,6 @@
 ---
 name: creating-3d-animated-site
-description: Use when the user wants a new single-page 3D animated website, Three.js WebGPU landing page, TSL/WebGPU marketing site, or asks to generate a Vite React Three Fiber site from a title and optional colors. Not for 2D GSAP/photo motion sites or horizontal-scroll portfolios.
+description: Use when the user wants a new single-page 3D animated website, Three.js WebGPU landing page, TSL/WebGPU marketing site, or a generated 3D site that looks fake, flat, or like a spinning primitive in a void. Not for 2D GSAP/photo motion sites or horizontal-scroll portfolios.
 ---
 
 # Creating a 3D animated site
@@ -22,23 +22,23 @@ Follow these steps in order. Do not skip.
 2. Validate the palette with the checker in this skill folder: `node scripts/check-palette.mjs <background> <foreground> <primary> <secondary> <accent> <muted>`. All eight checks must pass before you write any config.
 3. Copy `templates/3d-site/` to the output directory. Do not scaffold inside this skill folder.
 4. Generate all copy from the title using [references/section-recipes.md](references/section-recipes.md).
-5. Pick a scene recipe from the title using [references/scene.md](references/scene.md). Do not invent a new scene graph.
+5. Pick a scene recipe from the title using [references/scene.md](references/scene.md). Do not invent a new scene graph. Keep the studio set — read [references/realism.md](references/realism.md) before touching any scene file.
 6. Write `src/config/site.ts` so it satisfies `SiteConfig` in [references/content-schema.md](references/content-schema.md), including the `tone` on each section and `scene.recipe`.
 7. Set `index.html` `<title>` to the site title.
-8. Keep the template stacks. See [references/animations.md](references/animations.md) and [references/webgpu.md](references/webgpu.md). Do not add another library.
+8. Keep the template stacks. See [references/animations.md](references/animations.md) and [references/webgpu.md](references/webgpu.md). Do not add another library. Do not delete `StudioSet` or `StudioEnvironment`.
 9. Run `npm install && npm run dev` in the output directory.
-10. Check the result against the list at the end of [references/visual-system.md](references/visual-system.md).
+10. Check the result against the lists at the end of [references/visual-system.md](references/visual-system.md) and [references/realism.md](references/realism.md). A chrome sphere in a black void is a failed run.
 11. Tell the user: title, colors used, scene recipe, config path (`src/config/site.ts`), and that copy, colors, and the recipe are edited there.
 
 ## What the page is
 
-The template already composes the page. Your job is to fill it, not to restyle it or rebuild the renderer. Read [references/visual-system.md](references/visual-system.md) and [references/scene.md](references/scene.md) before writing config.
+The template already composes the page. Your job is to fill it, not to restyle it or rebuild the renderer. Read [references/visual-system.md](references/visual-system.md), [references/scene.md](references/scene.md), and [references/realism.md](references/realism.md) before writing config.
 
 - One fixed full-viewport WebGPU canvas. Six HTML bands over it: hero, about, features, gallery, testimonials, CTA.
 - Each band carries a `tone` — `base`, `surface`, or `inverse`. No two adjacent bands share one, and exactly one band is `inverse`.
 - One `display` headline (hero), one `statement` heading (about), everything else at `heading`.
 - Card surfaces, borders, and hover tints derive from the palette in CSS. You supply six hexes and a recipe, nothing else.
-- The 3D scene is procedural and tinted from those hexes. No photographs, no GLTFs, no HDRIs.
+- The 3D scene is a procedural **studio still life** tinted from those hexes: ground, cyclorama, TSL IBL, physical materials. No photographs, no GLTFs, no HDRIs. A single primitive in a void is a failed run.
 
 ## Hard rules
 
@@ -52,6 +52,7 @@ The template already composes the page. Your job is to fill it, not to restyle i
 - Keep Lenis, Motion (`motion/react`), and GSAP ScrollTrigger for HTML. Keep Three/TSL for 3D. Do not add another library.
 - GSAP never tweens Three objects. R3F `useFrame` never owns Lenis.
 - `prefers-reduced-motion`: freeze the canvas after one still frame.
+- Keep `src/scene/studio/` mounted. Recipes are still lifes (see [references/realism.md](references/realism.md)). Do not reduce a recipe to one sphere, box, or plane.
 
 ## Common mistakes
 
@@ -64,6 +65,8 @@ The template already composes the page. Your job is to fill it, not to restyle i
 - Writing a GLSL `ShaderMaterial` "because TSL looked harder"
 - Adding OrbitControls so "the user can inspect the model"
 - Loading a GLTF or HDRI instead of using the recipe table
+- Deleting `StudioSet` / `StudioEnvironment` or swapping physical materials for a flat color
+- Replacing a recipe with one sphere, one box, or one plane
 - Adding a second Canvas as a WebGL fallback
 - Leaving lorem ipsum in `site.ts`
 
@@ -78,7 +81,10 @@ The template already composes the page. Your job is to fill it, not to restyle i
 | "Router will make it more complete" | Single page only. Anchor links. |
 | "I'll write GLSL, TSL is new" | TSL only. GLSL will not run on WebGPU. |
 | "OrbitControls is standard in Three.js examples" | It steals the scroll. Forbidden. |
-| "A GLTF will look more real" | The skill forbids downloads. Use the recipe. |
+| "A GLTF will look more real" | A GLTF in a void still looks fake. Keep the studio set and the recipe still life. |
+| "I'll add drei Environment for realism" | `StudioEnvironment` is the IBL. Drei is forbidden. |
+| "One sphere is enough, it's cleaner" | One primitive in a void is the failure this skill prevents. Restore the still life. |
+| "I'll delete the floor to see the model better" | No floor means it floats. That is a failed run. |
 | "I'll add a WebGL Canvas just in case" | One Canvas. `WebGPURenderer` already falls back. |
 
 **When the canvas is black, double-scrolling, or the scene ignores the palette:** [references/gotchas.md](references/gotchas.md) first.

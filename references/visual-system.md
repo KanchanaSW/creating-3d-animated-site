@@ -20,8 +20,8 @@ One WebGPU canvas, `position: fixed; inset: 0; z-index: 0`. HTML bands sit at `z
 
 `tone` is a per-section field in `site.ts`, typed as `'base' | 'surface' | 'inverse'`. `Band.tsx` maps it to classes; no section sets its own background.
 
-- `base` — a light wash of the page background (`bg-background/25`) so the canvas peeks through.
-- `surface` — derived step with hairline rules, at ~80% opacity plus a hint of blur.
+- `base` — a light wash of the page background (`bg-background/16`) so the canvas peeks through.
+- `surface` — derived step with hairline rules, at ~52% opacity plus a hint of blur.
 - `inverse` — swaps `background` and `foreground` outright and re-derives every token beneath it, so `primary` stays legible inside. Keep this band close to opaque.
 
 Rules, in priority order:
@@ -62,7 +62,7 @@ The hero headline roughly doubles between mobile and desktop. That jump is what 
 
 Three devices, all already in the template:
 
-- **Canvas** — the 3D scene is the photograph. Hero scrims are lighter than a photo site so it survives under type.
+- **Canvas** — the 3D scene is the photograph: a studio still life, not a primitive in a void. Hero scrims stay light (`from-background/42`) so the set survives under type. See [realism.md](realism.md).
 - **Grain** — a fixed SVG noise layer at 4.5% over the whole page.
 - **Glow** — `.glow` paints two soft radial fields from `primary` and `accent` on the hero and about band.
 
@@ -75,8 +75,12 @@ Three devices, all already in the template:
 Open the page and look for these. Any "no" is a failed run, not a taste difference.
 
 - Is the 3D recipe readable in the hero — not a black rectangle?
+- Does the subject sit on a floor or pedestal, with a contact shadow?
+- Do metal surfaces show a studio reflection (IBL), not one plastic highlight?
+- Can you name at least two forms besides the main body (rings, columns, a ring around a planet, tubes, hills)?
 - Do later bands still show some of the scene, except the inverse quotes?
 - Do the feature cards have a visible edge against their section?
 - Is the hero headline at least twice the size of the section headings?
 - Do two different hues appear on screen at once (HTML and the scene)?
 - Does scrolling move the camera rather than spinning the model with the mouse?
+- Is idle motion a slow drift, not a fast spin?

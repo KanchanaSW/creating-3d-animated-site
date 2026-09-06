@@ -1,43 +1,45 @@
 import { useMemo } from 'react'
-import { MeshStandardNodeMaterial } from 'three/webgpu'
-import { color, float, positionLocal, sin, time, vec3 } from 'three/tsl'
+import { MeshPhysicalNodeMaterial } from 'three/webgpu'
+import { color, float, mix, positionLocal, sin, time, vec3 } from 'three/tsl'
 import { siteConfig } from '../../config/site'
 import { useGalleryBeatUniform } from '../useGalleryBeat'
+import { metalMaterial, stoneMaterial } from '../studio/materials'
 
 export function Terrain({ lite }: { lite: boolean }) {
   const beat = useGalleryBeatUniform()
-  const { primary, secondary } = siteConfig.colors
-  const segments = lite ? 48 : 96
+  const { primary, secondary, muted } = siteConfig.colors
+  const segments = lite ? 64 : 128
 
-  const material = useMemo(() => {
-    const mat = new MeshStandardNodeMaterial()
-    mat.colorNode = color(primary)
-    mat.metalness = 0.12
-    mat.roughness = 0.62
-    const wave = sin(positionLocal.x.mul(0.55).add(time.mul(0.28)))
-      .add(sin(positionLocal.z.mul(0.4).add(time.mul(0.18))))
-      .mul(float(0.22).add(beat.mul(0.28)))
+  const land = useMemo(() => {
+    const mat = new MeshPhysicalNodeMaterial()
+    const wave = sin(positionLocal.x.mul(0.42).add(time.mul(0.12)))
+      .add(sin(positionLocal.z.mul(0.31).add(time.mul(0.08))))
+      .add(sin(positionLocal.x.mul(0.9).add(positionLocal.z.mul(0.7))).mul(0.35))
+      .mul(float(0.28).add(beat.mul(0.22)))
     mat.positionNode = positionLocal.add(vec3(0, wave, 0))
-    return mat
-  }, [beat, primary])
-
-  const floor = useMemo(() => {
-    const mat = new MeshStandardNodeMaterial()
-    mat.colorNode = color(secondary)
+    mat.colorNode = mix(color(secondary), color(primary), wave.mul(1.1).add(0.55))
     mat.metalness = 0.08
-    mat.roughness = 0.85
+    mat.roughness = 0.72
+    mat.envMapIntensity = 0.45
     return mat
-  }, [secondary])
+  }, [beat, primary, secondary])
+
+  const apron = useMemo(() => stoneMaterial(muted), [muted])
+  const sun = useMemo(() => metalMaterial(primary, 0.08), [primary])
 
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.6, 0]}>
-        <planeGeometry args={[10, 10, segments, segments]} />
-        <primitive attach="material" object={material} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.55, 0]}>
+        <planeGeometry args={[14, 14, segments, segments]} />
+        <primitive attach="material" object={land} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.95, 0]}>
-        <planeGeometry args={[14, 14, 1, 1]} />
-        <primitive attach="material" object={floor} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.92, 0]}>
+        <circleGeometry args={[18, 48]} />
+        <primitive attach="material" object={apron} />
+      </mesh>
+      <mesh position={[-2.4, 1.35, -3.2]}>
+        <sphereGeometry args={[0.22, 24, 24]} />
+        <primitive attach="material" object={sun} />
       </mesh>
     </group>
   )

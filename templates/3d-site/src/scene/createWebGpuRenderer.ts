@@ -1,4 +1,4 @@
-import { WebGPURenderer } from 'three/webgpu'
+import { ACESFilmicToneMapping, WebGPURenderer } from 'three/webgpu'
 
 /** The only place WebGPURenderer is constructed. Always await init(). */
 export async function createWebGpuRenderer(props: object) {
@@ -9,5 +9,7 @@ export async function createWebGpuRenderer(props: object) {
     powerPreference: 'high-performance',
   })
   await renderer.init()
+  renderer.toneMapping = ACESFilmicToneMapping
+  renderer.toneMappingExposure = 1.12
   return renderer
 }

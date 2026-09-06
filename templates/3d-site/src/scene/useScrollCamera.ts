@@ -3,16 +3,17 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three/webgpu'
 import { scrollSnapshot } from './scrollSnapshot'
 
+/** Look below the still-life center so the subject sits in the upper half, above the hero type. */
 const POSES: Array<[number, number, number]> = [
-  [0, 0.35, 5.2],
-  [1.6, 0.8, 4.4],
-  [0, 1.8, 6.5],
-  [-1.4, 0.6, 4.0],
-  [0.4, -0.2, 7.2],
-  [0, 2.4, 8.5],
+  [0, 0.92, 3.65],
+  [1.28, 1.02, 3.35],
+  [0.18, 1.35, 4.55],
+  [-1.18, 0.88, 3.25],
+  [0.3, 0.72, 4.95],
+  [0, 1.42, 5.45],
 ]
 
-const ORIGIN: [number, number, number] = [0, 0, 0]
+const LOOK: [number, number, number] = [0, -0.38, 0]
 
 export function useScrollCamera(reduced: boolean) {
   const camera = useThree((state) => state.camera)
@@ -22,7 +23,7 @@ export function useScrollCamera(reduced: boolean) {
   useFrame((_, delta) => {
     if (reduced) {
       camera.position.set(...POSES[0])
-      camera.lookAt(...ORIGIN)
+      camera.lookAt(...LOOK)
       return
     }
 
@@ -38,7 +39,7 @@ export function useScrollCamera(reduced: boolean) {
     )
     const lerp = 1 - Math.pow(0.0008, delta)
     camera.position.lerp(target, lerp)
-    look.set(0, 0, 0)
+    look.set(...LOOK)
     camera.lookAt(look)
   })
 }

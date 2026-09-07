@@ -1,5 +1,6 @@
 node_modules/
 dist/
 .DS_Store
-templates/3d-site/node_modules/
-templates/3d-site/dist/
+templates/3d-stage/node_modules/
+templates/3d-stage/dist/
+shots/

@@ -1,86 +1,74 @@
 # Visual system
 
-What a generated page is, in order. The template implements all of it; this file exists so you can tell whether a run came out right, and so you do not undo it by hand-styling a section.
+What a generated page is, in order. The template implements all of it; this file exists so you can tell whether a run came out right, and so you do not undo it by stacking HTML bands over the subject.
 
 ## The page
 
-One WebGPU canvas, `position: fixed; inset: 0; z-index: 0`. HTML bands sit at `z-index: 10` and are mostly translucent so the scene remains the photograph.
+One WebGL canvas, `position: fixed; inset: 0; z-index: 0`. Overlay UI is `position: fixed` in reserved **zones**. An invisible `.scroll-track` at 620vh is the only document flow. Copy never scrolls as a column of bands.
 
-| Band | id | Tone | Shape |
-|---|---|---|---|
-| Hero | `hero` | — | live scene, light scrims, `display` headline masked in by word |
-| About | `about` | `base` | text split with a glass window into the canvas, the page's one `statement` heading, stats on hairlines |
-| Features | `features` | `surface` | three bordered cards that lift on hover, numbered `01`–`03` |
-| Gallery | `gallery` | `base` | four glass caption tiles (wide, narrow / narrow, wide); scroll scrubs a 3D morph |
-| Testimonials | `stories` | `inverse` | the light band on a dark page, or the dark band on a light one — more opaque so quotes stay readable |
-| CTA | `contact` | `base` | `primary` → `secondary` gradient panel with an `accent` bloom |
-| Footer | — | `surface` | brand and links |
+| Zone | Where | Role |
+|---|---|---|
+| `#stage` | full viewport | canvas + vignette + grain |
+| `.chrome` | top edge | mark, wordmark, badge |
+| `.hero` | bottom-left | eyebrow, display headline, subtitle, lede. Off after `p > 0.08` |
+| `.rail` | left-center | layer index. Hidden under 860px |
+| `.chapter` | right-center | index, title, kicker, copy, body, three facts. On for `0.1 < p < 0.97` |
+| `.callouts` | over the subject | projected labels, one at a time |
+| `.hint` | bottom-center | scroll cue. Off after `p > 0.1` |
+| `.colophon` | bottom-right | credits. On after `p > 0.88` |
 
-## Tone
+The subject keeps the **center**. If a headline sits on the object, the camera start is too centered or the hero is too wide — fix the camera, do not add a scrim.
 
-`tone` is a per-section field in `site.ts`, typed as `'base' | 'surface' | 'inverse'`. `Band.tsx` maps it to classes; no section sets its own background.
-
-- `base` — a light wash of the page background (`bg-background/16`) so the canvas peeks through.
-- `surface` — derived step with hairline rules, at ~52% opacity plus a hint of blur.
-- `inverse` — swaps `background` and `foreground` outright and re-derives every token beneath it, so `primary` stays legible inside. Keep this band close to opaque.
-
-Rules, in priority order:
-
-1. No two adjacent bands share a tone.
-2. Exactly one `inverse` band per page. It is normally `stories`.
-3. `surface` appears at most twice.
-
-The defaults in the table already satisfy this. If you change one tone, re-check rule 1.
-
-Do not paint hero, about, or gallery fully opaque. That hides the canvas and the run has failed.
+Hero and chapter never share the screen. That is the collision rule.
 
 ## Type scale
 
-Set in `@theme`, fluid, four steps with real jumps between them. Use the token, never `text-4xl sm:text-5xl`.
+Three families, loaded in `index.html`. Use the class, never a one-off `font-size`.
 
-| Token | Size | Used by |
+| Role | Font | Size | Tracking | Case |
+|---|---|---|---|---|
+| Display (hero h1, chapter h2) | Bebas Neue | clamp 72–148px / 40–58px | 0.02–0.04em | default |
+| Body (lede, copy, body, callout note) | Outfit 300–400 | 13–15px | normal | sentence |
+| Meta (chrome, eyebrow, kicker, facts, rail, hint, colophon) | IBM Plex Mono | 10–11px | 0.12–0.28em | **uppercase** |
+
+The hero headline is at least twice the chapter title. That jump is what makes the first viewport read as a poster rather than a UI.
+
+## Color tokens
+
+Set as CSS variables from `siteConfig.colors` at boot (`--ink`, `--steel`, `--ember`, `--paper`, plus dim/faint mixes). Use them. Do not hand-pick a card color.
+
+| Token | Source | Use |
 |---|---|---|
-| `text-display` | `clamp(3rem, 9vw, 8rem)` | hero headline only |
-| `text-statement` | `clamp(2.25rem, 5.2vw, 4.5rem)` | exactly one section heading per page — the About heading |
-| `text-heading` | `clamp(1.75rem, 3.2vw, 3rem)` | every other section heading |
-| `text-sub` | `clamp(1.05rem, 1.5vw, 1.375rem)` | lead paragraphs, card titles, gallery captions |
-| `text-micro` | `0.6875rem`, `0.18em` tracking | eyebrows, stat labels, credits, badges — always with `font-mono` |
+| `--ink` | `background` | page, fog, canvas clear |
+| `--paper` | `foreground` | type, key light |
+| `--ember` | `primary` | mark, eyebrows, rail current, facts dashes, rim light |
+| `--steel` | `muted` | quiet fills |
+| `--paper-dim` | foreground 55% | lede, body, chrome |
+| `--paper-faint` | foreground 18% | rules, inactive rail |
 
-The hero headline roughly doubles between mobile and desktop. That jump is what makes the page read as designed rather than as a stack of sections.
-
-## Derived surfaces
-
-`src/index.css` mixes these from the two page colors. Use them; do not hand-pick equivalents.
-
-| Token | Mix | Used by |
-|---|---|---|
-| `surface` | background 91% + foreground | `surface` bands, footer, quote cards |
-| `raised` | background 85% + foreground | feature cards |
-| `hairline` | background 78% + foreground | every border and rule on the page |
+One dominant chroma (`primary` / `--ember`) against a neutral ground. `accent` may equal `primary`. A second hue appears only if the real object has one (a blue steel on an otherwise ember board). Inventing a complementary accent "for contrast" is how the last run grew a cyan cube.
 
 ## Depth
 
 Three devices, all already in the template:
 
-- **Canvas** — the 3D scene is the photograph: a studio still life, not a primitive in a void. Hero scrims stay light (`from-background/42`) so the set survives under type. See [realism.md](realism.md).
-- **Grain** — a fixed SVG noise layer at 4.5% over the whole page.
-- **Glow** — `.glow` paints two soft radial fields from `primary` and `accent` on the hero and about band.
+- **Canvas** — the object is the photograph. No hero scrim, no band wash. Vignette only, at the edges where type lives.
+- **Grain** — SVG fractal noise at 7% overlay on `#stage`.
+- **Shadow pool** — canvas radial under the object, opacity falling with `p`. Plus a real shadow map.
 
-## Accent roles
-
-`accent` must appear at least twice in HTML (the second radial in `.glow`, and the bloom on the CTA panel) and once in the scene (a point light or emissive). A palette whose accent renders nowhere is a failed run.
+Do not add `backdrop-blur` panels, glass cards, or a numbered feature grid. Those belong to the old band template and they sit on the subject.
 
 ## Checking a run
 
 Open the page and look for these. Any "no" is a failed run, not a taste difference.
 
-- Is the 3D recipe readable in the hero — not a black rectangle?
-- Does the subject sit on a floor or pedestal, with a contact shadow?
-- Do metal surfaces show a studio reflection (IBL), not one plastic highlight?
-- Can you name at least two forms besides the main body (rings, columns, a ring around a planet, tubes, hills)?
-- Do later bands still show some of the scene, except the inverse quotes?
-- Do the feature cards have a visible edge against their section?
-- Is the hero headline at least twice the size of the section headings?
-- Do two different hues appear on screen at once (HTML and the scene)?
-- Does scrolling move the camera rather than spinning the model with the mouse?
-- Is idle motion a slow drift, not a fast spin?
+- Can you name the 3D object in one word without reading the headline?
+- Does the subject sit in the center with type in the corners, not over it?
+- Does the hero headline read (no wash, no overlap with the object)?
+- Do metal / coated surfaces show a studio reflection?
+- Is there a real shadow under the object?
+- Does scrolling peel layers rather than spin the model?
+- Does the chapter panel appear only after the hero leaves?
+- Are facts set in mono with an ember dash, not as SaaS stat counters?
+- Is there exactly one chroma on screen besides ink and paper, unless the object itself has two?
+- `window.__audit().meshes >= 40` and `shadowCasters > 0`?

@@ -1,49 +1,47 @@
 # Animation patterns
 
-Do not invent a second motion stack. Keep Lenis, Motion (`motion/react`), and GSAP ScrollTrigger for HTML. Keep Three.js WebGPU + TSL for the canvas.
+Do not invent a second motion stack. Keep Lenis and GSAP ScrollTrigger. Keep Three.js WebGL for the canvas. There is no Motion (`motion/react`), no R3F `useFrame`, no CSS scroll-driven animation on the subject.
 
 | Library | Use for | Do not use for |
 |---|---|---|
 | Lenis | page-level smooth scrolling | element tweens, Three camera |
-| Motion (`motion/react`) | hero headline, nav, buttons, hover, page load | long scroll timelines, Three objects |
-| GSAP ScrollTrigger | section reveals; writing scroll progress into `scrollSnapshot` | button hover, `mesh.rotation` |
-| R3F `useFrame` | idle rotation, applying camera/uniforms from `scrollSnapshot` | Lenis, DOM |
+| GSAP ScrollTrigger | the one tween of `state.p` from 0 → 1 | `mesh.position`, `camera.position`, button hover |
+| `gsap.ticker` | the unified RAF: `lenis.raf` + `frameFromProgress` + `render` | a second loop |
+| Three, in `frameFromProgress(p)` | camera, explosion, lights, UI gates | anything time-based that ignores `p` |
 
 ## The RAF split
 
 ```
-wheel / trackpad / touch → Lenis (on the GSAP ticker, autoRaf never)
-  → ScrollTrigger.update → HTML reveals
-  → scrollSnapshot.progress / galleryBeat
-R3F useFrame → read snapshot → camera + TSL uniforms + idle spin
+wheel / trackpad / touch → Lenis (on the GSAP ticker, autoRaf: false)
+  → ScrollTrigger.update
+  → state.p   (scrub: 0.35)
+gsap.ticker → lenis.raf(t) → frameFromProgress(p) → renderer.render()
 ```
 
-GSAP never tweens Three objects. R3F never calls `lenis.raf`. If you wrap Lenis in its own `requestAnimationFrame`, you have two HTML frame loops — stop and restore `initSmoothScroll`.
+GSAP never tweens Three objects. If you wrap Lenis in its own `requestAnimationFrame`, you have two HTML frame loops — stop and restore `autoRaf: false` plus the ticker.
+
+Full numbers, camera waypoints, layer windows, and UI gates: [choreography.md](choreography.md).
 
 ## What the template already runs
 
-- **Hero headline** — each word sits in an `overflow-hidden` span and slides up from `y: 108%`, staggered.
-- **Nav** — Motion slide-in on load; the pill gains its border, blur, and shadow past 40px of scroll.
-- **Sections** — `useGsapReveal` on the `Band` root. Mark heading and children with `data-reveal`.
-- **Buttons and cards** — Motion `whileHover={{ scale: 1.03 }}` / `whileTap={{ scale: 0.98 }}`; cards lift on CSS transition.
-- **Camera** — `useScrollCamera` lerps six poses from `scrollSnapshot.progress`. Gallery beat morphs the recipe while `#gallery` is in view.
+- **Scroll track** — 620vh invisible driver.
+- **Camera** — three-waypoint arc + pointer parallax, all inside `frameFromProgress`.
+- **Explosion** — `applyExplosion(subject, p)` with overlapping `LAYER_WINDOWS`.
+- **Underglow / shadow pool** — intensity and opacity follow `p`.
+- **Subject yaw** — `-8° + p * 0.35`. Not an idle spin.
+- **Hero / hint / chapter / colophon / callouts** — class toggles from `p` thresholds. CSS opacity transitions (0.25–0.4s).
+- **Hint drip** — CSS keyframe on `.hint-line`. Off under reduced motion.
+- **Rail jumps** — `lenis.scrollTo(chapter.at * maxScroll, { duration: 0.9 })`.
 
-## Reveals are batched `to` tweens, not `from`
-
-`useGsapReveal` sets the hidden state with `gsap.set`, then plays a `gsap.to` per batch with `once: true`.
-
-This matters. A `gsap.from` tween is reverted to its start values on every `ScrollTrigger.refresh()` — which fires when fonts settle — and elements that were mid-reveal get stranded at `opacity: 0`. If you rewrite this hook as a single `from` tween, sections will intermittently render empty.
-
-`initSmoothScroll` also calls `ScrollTrigger.refresh()` once `document.fonts.ready` resolves, because web fonts change text metrics and move every trigger.
+Do not add a masked word-by-word hero reveal, card lift hovers, or section `data-reveal` batches. There are no bands to reveal.
 
 ## Reduced motion
 
 If `window.matchMedia('(prefers-reduced-motion: reduce)')` matches:
 
-- Do not start Lenis.
-- Do not run GSAP tweens or ScrollTrigger.
-- Motion components read `useReducedMotion()` and pass `initial={false}`, so nothing animates in.
-- Canvas `frameloop="never"` after one still frame. No idle rotation. No camera travel.
-- Keep the static layout, config-driven content, and one frozen view of the recipe.
+- Lenis `lerp: 1`, `smoothWheel: false`.
+- Do not create the scrub tween. `state.p` starts at `1`.
+- CSS transitions and the hint drip are off.
+- Canvas still renders. The frame is the exploded state, every layer named.
 
-The template implements all of this in `SmoothScroll`, `useGsapReveal`, `Hero`, `Nav`, and `WebGPUCanvas`. Do not remove those guards.
+The template implements this in `src/main.js` and `src/style.css`. Do not remove those guards.

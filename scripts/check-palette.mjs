@@ -80,7 +80,7 @@ const checks = [
     pass: contrast(colors.primary, colors.background) >= 3,
   },
   {
-    label: 'button text: background on primary >= 4.5',
+    label: 'ink on primary >= 4.5',
     value: contrast(colors.background, colors.primary).toFixed(2),
     pass: contrast(colors.background, colors.primary) >= 4.5,
   },
@@ -90,14 +90,14 @@ const checks = [
     pass: contrast(colors.accent, colors.background) >= 3,
   },
   {
-    label: 'accent hue is >= 60 deg from primary',
+    label: 'accent is in the primary family (<= 30 deg)',
     value: `${hueGap(colors.accent, colors.primary)} deg`,
-    pass: hueGap(colors.accent, colors.primary) >= 60,
+    pass: hueGap(colors.accent, colors.primary) <= 30,
   },
   {
-    label: 'secondary is within 60 deg of primary (gradient partner)',
+    label: 'secondary is within 30 deg of primary',
     value: `${hueGap(colors.secondary, colors.primary)} deg`,
-    pass: hueGap(colors.secondary, colors.primary) <= 60,
+    pass: hueGap(colors.secondary, colors.primary) <= 30,
   },
   {
     label: 'primary is not a grey (saturation >= 0.15)',
@@ -119,5 +119,5 @@ for (const check of checks) {
   console.log(`${check.pass ? 'pass' : 'FAIL'}  ${check.label.padEnd(52)} ${check.value}`)
 }
 
-console.log(failed === 0 ? '\npalette passes' : `\n${failed} check(s) failed — adjust before writing site.ts`)
+console.log(failed === 0 ? '\npalette passes' : `\n${failed} check(s) failed — adjust before writing site.js`)
 process.exit(failed === 0 ? 0 : 1)

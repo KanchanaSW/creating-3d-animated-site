@@ -1,63 +1,71 @@
 # Realism contract
 
-The canvas must read as a **studio photograph**, not a Three.js hello-world. This file exists because a generated watch site shipped as a chrome sphere in a black void — and that is a failed run.
+The canvas must read as a **photographed object**, not a Three.js hello-world and not a studio still life of unrelated primitives. This file exists because a generated keyboard site shipped as a 6×6 grid of pastel boxes — and that is a failed run.
 
-The template already implements the contract. Do not strip it. Do not replace a recipe with a single untextured primitive.
+The template already implements the renderer, the light rig, and a worked-example keyboard. Your job is to replace the keyboard with the named subject without stripping the rig. Read [subject.md](subject.md) before editing `src/subject.js`. Read [renderer.md](renderer.md) before touching lights.
 
 ## What a passing hero looks like
 
 At the first viewport you can name:
 
-1. **A subject** with more than one form (body + rings / columns / planet + field / ribbons / hills).
-2. **A room** — a ground plane, a contact shadow, a cyclorama. The object sits on something.
-3. **Reflections** — metals show the studio, not a single white specular dot on flat plastic.
-4. **Two light temperatures** — a warm key and a cooler fill or rim, plus the procedural IBL.
+1. **The object in the title.** A keyboard is a keyboard. A watch is a watch. Not a lattice, not an orb, not a ribbon.
+2. **Four or more layers** that will separate on scroll — you can already see the stack in the closed state (caps sitting on a plate sitting on a case).
+3. **A room** — fogged ink background, a contact shadow pool, and a key light that casts a real shadow. The object sits on something.
+4. **Reflections** — metals show `RoomEnvironment`, not a single white specular dot.
+5. **Two light temperatures** — a near-white key and a `primary`-colored rim / underglow.
 
-If you cannot name those four things, the run failed. Recolor is not a fix. Re-read [scene.md](scene.md) and restore `StudioSet` + `StudioEnvironment`.
+If you cannot name those five things, the run failed. Recolor is not a fix.
 
-## The set (always on)
+## The rig (always on)
 
-These stay mounted in `Scene.tsx` for every recipe:
+Do not delete these from `src/main.js`:
 
-| Piece | File | Why |
-|---|---|---|
-| Procedural IBL | `src/scene/studio/environment.ts` | Metals need something to reflect. No HDRI download. |
-| Cyclorama + floor + contact shadow | `src/scene/studio/StudioSet.tsx` | Stops the subject floating in a void. |
-| Physical materials | `src/scene/studio/materials.ts` | `MeshPhysicalNodeMaterial` + TSL roughness grain, clearcoat, optional iridescence. |
-| ACES tone mapping | `createWebGpuRenderer.ts` | Filmic response. Do not leave default linear. |
-
-Lights: hemisphere + a near-white key + cool fill + warm rim/spot. Key is `foreground`, not a saturated brand color. Colored lights only on fill/rim.
-
-## What each recipe must be
-
-A recipe is a **still life**, not a primitive.
-
-| Recipe | Still life |
+| Piece | Why |
 |---|---|
-| `orb` | Pedestal + main body + at least two rings + accent jewels |
-| `lattice` | Columns of mixed height and material standing on the floor |
-| `field` | A planet (or moon) + a ring + a dust field with size falloff |
-| `ribbon` | Volume tubes on curves, not flat waving planes |
-| `terrain` | Multi-octave ground, a horizon apron, one distant light |
+| ACES + exposure 1.05 + sRGB | Filmic response. Linear looks cheap. |
+| `PMREMGenerator` + `RoomEnvironment` at 0.55 | Metals need something to reflect. |
+| Hemisphere + near-white key (shadows on) + primary rim + fill + underglow | One colored key washes the subject. |
+| Fog matched to `colors.background`, near 7.5 far 16 | Unmatched fog draws a halo. |
+| Radial canvas shadow plane whose opacity falls with `p` | The object has weight. |
+| CSS vignette + grain | Edges hold the overlays. |
 
-Idle motion is a slow drift (`~0.045` rad/s) on the **subject group only**. The studio does not spin.
+Lights: the key is `foreground`, never a saturated brand color. Colored light only on rim and underglow. See [renderer.md](renderer.md) for the exact numbers.
+
+## Materials
+
+Use the factories in `src/materials.js`. Exact starting values:
+
+| Kind | Class | roughness | metalness | Extra |
+|---|---|---|---|---|
+| Plastic / PBT | `MeshPhysicalMaterial` | 0.34 | 0.04 | clearcoat 0.7, clearcoatRoughness 0.22, sheen 0.18 |
+| Chassis coat | `MeshPhysicalMaterial` | 0.46 | 0.22 | clearcoat 0.4 |
+| Brushed plate | `MeshPhysicalMaterial` | 0.32 | 0.72 | canvas `map` for cutouts |
+| Smoked housing | `MeshPhysicalMaterial` | 0.42 | 0.18 | opacity 0.92 |
+| Hardware | `MeshStandardMaterial` | 0.28 | 0.70 | pins, screws, USB |
+| Foam | `MeshPhysicalMaterial` | 0.92 | 0 | — |
+| Print / legend | `MeshBasicMaterial` | — | — | `toneMapped: false`, canvas map |
+
+A body part with only `{ color }` on `MeshStandardMaterial` is a failed run.
 
 ## What you may not do
 
-- Delete `StudioSet` or `StudioEnvironment` "to simplify"
-- Swap physical materials back to a flat `MeshStandardNodeMaterial` color
-- Add `@react-three/drei` `Environment` or an HDRI / GLTF / texture download
-- Leave the subject as one sphere / one box / one plane
-- Pull the camera so far back the still life reads as a speck (`z` stays under ~6.2)
+- Leave the keyboard example in place for a non-keyboard title
+- Swap the subject for a sphere / box grid / torus "because it's cleaner"
+- Delete the floor shadow or disable `shadowMap`
+- Skip `RoomEnvironment` and hope the directional lights will do
+- Load an HDRI, a GLTF, or drei `Environment`
+- Pull the camera back past `z ≈ 4` on desktop start (the object becomes a speck)
+- Auto-spin the subject (`rotation.y += delta`) — scroll rotates it a few degrees, that's all
 
 ## Check after `npm run dev`
 
 Open the hero. Any "no" is a failed run:
 
-- Is there a floor or pedestal under the subject?
-- Do metal surfaces show a studio reflection, not a single highlight?
-- Can you see at least two distinct forms besides the main body?
-- Does the scene still peek through About and Features (not a solid fill)?
-- Is the motion a slow drift, not a fidget-spinner?
+- Can a stranger name the object without reading the headline?
+- Is there a real shadow under it, not a dark disc?
+- Do metal or clearcoated surfaces show a studio reflection?
+- Are there small parts (screws, pins, a port, feet) that give it scale?
+- Does type exist on the object (legends, silkscreen, a dial)?
+- `window.__audit().meshes >= 40` and `shadowCasters > 0`?
 
-A GLTF without this set still looks fake. The set is what makes the page look real.
+Then run `scripts/shoot.mjs` against the dev server. A box grid will fail the mesh floor. A chrome sphere will fail shadow casters or the "name the object" test. Both are failed runs — restore the subject, do not patch the checker.

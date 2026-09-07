@@ -1,8 +1,8 @@
 # creating-3d-animated-site
 
-A [Cursor](https://cursor.com) and [Claude Code](https://claude.com/claude-code) skill that scaffolds a **single-page 3D animated website** from a required title and optional colors. All copy, colors, and the scene recipe live in `src/config/site.ts`. A persistent Three.js WebGPU canvas sits behind six HTML bands.
+A [Cursor](https://cursor.com) and [Claude Code](https://claude.com/claude-code) skill that scaffolds a **single-page 3D product teardown** from a required title and optional colors. The agent models the named object into `src/subject.js`. Copy and colors live in `src/config/site.js`. A persistent Three.js WebGL canvas fills the viewport; overlay chapters ride a 620vh scroll track.
 
-Not a 2D photo + GSAP marketing page (that is creating-motion-site). Not a horizontal-scroll résumé camera (that is scroll-portfolio).
+Not a 2D photo + GSAP marketing page (that is creating-motion-site). Not a horizontal-scroll résumé camera (that is scroll-portfolio). Not a spinning primitive in a void.
 
 ## Install
 
@@ -45,42 +45,44 @@ Title is required. The agent must ask and stop if you omit it.
 
 ```
 SKILL.md                         inputs, workflow, hard rules
-references/content-schema.md     SiteConfig types and field rules
-references/color-system.md       hex parsing + nine mood palettes + contrast floors
-references/visual-system.md      band tones, type scale, derived surfaces, 3D peeking
-references/realism.md            studio photograph contract (floor, IBL, still life)
-references/section-recipes.md    copy lengths, nav, section ids
-references/animations.md         Lenis, Motion, GSAP roles (HTML only)
-references/webgpu.md             renderer init, import paths, fallback
-references/scene.md              five recipes, camera keyframes, one Canvas
-references/gotchas.md            black canvas / GLSL / OrbitControls / extra Canvas
-templates/3d-site/               Vite + React + Tailwind + WebGPU starter
-evals/scenarios.md               happy path / missing title / no colors / composition
+references/content-schema.md     SiteConfig shape (chapters, callouts)
+references/color-system.md       hex parsing + ten mood palettes + contrast floors
+references/visual-system.md      overlay zones, type scale, one-chroma rule
+references/realism.md            photographed-object contract
+references/section-recipes.md    copy lengths for hero / chapters / callouts
+references/animations.md         Lenis + GSAP ticker roles
+references/renderer.md           WebGL, ACES, PMREM RoomEnvironment, shadows
+references/scene.md              one subject, no recipe enum
+references/subject.md            parts-table modeling method
+references/choreography.md       one scalar p, explosion windows, UI gates
+references/gotchas.md            black canvas / OrbitControls / box-grid
+templates/3d-stage/              Vite + vanilla Three.js + GSAP + Lenis starter
+evals/scenarios.md               happy path / missing title / subject naming
 scripts/check-palette.mjs        eight-check palette validator
+scripts/shoot.mjs                screenshot audit + mesh/shadow floors
 scripts/install.sh               dual-runtime symlink
 ```
 
 ## What the skill builds
 
-A vertical single page with hash links (`#hero`, `#about`, `#gallery`, `#contact`). No React Router.
+A vertical single page with a fixed 3D stage. No React. No React Router. Scroll peels the object apart.
 
-The agent copies `templates/3d-site/` into the output directory, invents copy from the title, picks a scene recipe, and writes colors into `src/config/site.ts`. After generation, edit that file only.
+The agent copies `templates/3d-stage/` into the output directory, names a real object from the title, models it in `src/subject.js`, and writes colors plus chapter copy into `src/config/site.js`. After generation, edit `site.js` for copy and `subject.js` for the object.
 
-One WebGPU canvas, full viewport, fixed behind the page. Scroll drives camera keyframes and TSL uniforms. Six HTML bands with deliberate rhythm:
+One WebGL canvas, full viewport, fixed. Scroll drives a single scalar `p` that moves the camera and explodes 4–7 physical layers. Overlay UI sits in reserved corners:
 
-| Band | Tone | Shape |
-|---|---|---|
-| Hero | — | type over the live scene, light scrims, masked word-by-word `display` headline |
-| About | `base` | split layout, the page's one `statement` heading, stats on hairlines, a glass window into the canvas |
-| Features | `surface` | numbered cards with real borders that lift on hover |
-| Gallery | `base` | four glass caption tiles; scrolling them scrubs a 3D morph |
-| Testimonials | `inverse` | the palette flips — a light band on a dark page |
-| CTA | `base` | `primary` → `secondary` gradient panel with an `accent` bloom |
+| Zone | Where |
+|---|---|
+| Hero | bottom-left, off after the first beat |
+| Layer rail | left-center |
+| Chapter panel | right-center, one layer at a time |
+| Callouts | projected onto the object |
+| Hint / colophon | bottom-center / bottom-right |
 
-You supply six hexes and a recipe (`orb`, `lattice`, `field`, `ribbon`, `terrain`). The canvas is a studio still life (ground, cyclorama, TSL IBL, physical materials) — not a primitive in a void. Palettes are validated before generation:
+You supply six hexes. The canvas is a photographed object (beveled extrudes, canvas prints, real shadows, RoomEnvironment IBL) — not a primitive in a void. Palettes are validated before generation:
 
 ```bash
-node scripts/check-palette.mjs '#0B0A0F' '#F4F1EA' '#E8B96A' '#B4763C' '#9FC3FF' '#191620'
+node scripts/check-palette.mjs '#0D0D0D' '#F5F5F5' '#FF6B35' '#E2703A' '#FF6B35' '#1F1F1F'
 ```
 
 Motion stack (do not add another library):
@@ -88,15 +90,14 @@ Motion stack (do not add another library):
 | Library | Role |
 |---|---|
 | Lenis | page-level smooth scrolling |
-| Motion (`motion/react`) | masked hero words, nav pill, button hover |
-| GSAP ScrollTrigger | section reveals; writes scroll progress for the camera |
-| Three.js WebGPU + TSL | the scene, via React Three Fiber v9 |
+| GSAP ScrollTrigger | the one tween of `p` from 0 → 1 |
+| Three.js WebGL | the subject, via `frameFromProgress(p)` |
 
-No photographs. The scene is procedural. For `prefers-reduced-motion`, Lenis and GSAP never start, Motion components render at their final state, and the canvas freezes after one still frame.
+No photographs. The subject is procedural. For `prefers-reduced-motion`, the scrub never starts and the canvas freezes on the exploded frame.
 
 ## After install
 
-Restart Cursor / start a new Claude Code session so the skill is in the catalog. Give a title and ask to scaffold a 3D animated site. The agent should read `SKILL.md`, then `references/visual-system.md`, `references/content-schema.md`, `references/scene.md`, `references/realism.md`, and `references/webgpu.md`, before writing config.
+Restart Cursor / start a new Claude Code session so the skill is in the catalog. Give a title and ask to scaffold a 3D animated site. The agent should read `SKILL.md`, then `references/subject.md`, `references/visual-system.md`, `references/content-schema.md`, `references/renderer.md`, and `references/realism.md`, before writing files.
 
 ## Credits
 

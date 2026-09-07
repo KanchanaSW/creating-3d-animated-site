@@ -1,11 +1,11 @@
 ---
 name: creating-3d-animated-site
-description: Use when the user wants a new single-page 3D animated website, Three.js WebGPU landing page, TSL/WebGPU marketing site, or a generated 3D site that looks fake, flat, or like a spinning primitive in a void. Not for 2D GSAP/photo motion sites or horizontal-scroll portfolios.
+description: Use when the user wants a new single-page 3D animated website, Three.js product teardown, scroll-driven exploded view, or a generated 3D site that looks fake, flat, or like a spinning primitive in a void. Not for 2D GSAP/photo motion sites or horizontal-scroll portfolios.
 ---
 
 # Creating a 3D animated site
 
-Scaffold the bundled Vite template, then write all copy, colors, tones, and the scene recipe into `src/config/site.ts`. Components already read that file. A persistent WebGPU canvas sits behind the HTML bands.
+Scaffold the bundled Vite template, then **model the named object** into `src/subject.js` and write copy plus colors into `src/config/site.js`. A persistent WebGL canvas fills the viewport. Overlay chapters ride a 620vh scroll track. Scroll peels the object apart layer by layer.
 
 ## Inputs
 
@@ -18,73 +18,79 @@ If the title is missing, ask once and stop. Do not invent a title. Do not scaffo
 
 Follow these steps in order. Do not skip.
 
-1. Confirm the title. Parse colors or choose a mood palette from [references/color-system.md](references/color-system.md).
-2. Validate the palette with the checker in this skill folder: `node scripts/check-palette.mjs <background> <foreground> <primary> <secondary> <accent> <muted>`. All eight checks must pass before you write any config.
-3. Copy `templates/3d-site/` to the output directory. Do not scaffold inside this skill folder.
-4. Generate all copy from the title using [references/section-recipes.md](references/section-recipes.md).
-5. Pick a scene recipe from the title using [references/scene.md](references/scene.md). Do not invent a new scene graph. Keep the studio set — read [references/realism.md](references/realism.md) before touching any scene file.
-6. Write `src/config/site.ts` so it satisfies `SiteConfig` in [references/content-schema.md](references/content-schema.md), including the `tone` on each section and `scene.recipe`.
-7. Set `index.html` `<title>` to the site title.
-8. Keep the template stacks. See [references/animations.md](references/animations.md) and [references/webgpu.md](references/webgpu.md). Do not add another library. Do not delete `StudioSet` or `StudioEnvironment`.
+1. Confirm the title. **Name the physical object** it refers to, and list 4–7 layers that will separate on scroll. If the title is abstract, pick the nearest real artifact and commit to it before modeling. Read [references/subject.md](references/subject.md).
+2. Parse colors or choose a mood palette from [references/color-system.md](references/color-system.md). One dominant chroma against a neutral ground. A second hue only if the real object has one.
+3. Validate the palette: `node scripts/check-palette.mjs <background> <foreground> <primary> <secondary> <accent> <muted>`. All checks must pass before you write any config.
+4. Copy `templates/3d-stage/` to the output directory. Do not scaffold inside this skill folder.
+5. **Rewrite `src/subject.js`** for the named object (data table, beveled extrudes, detail pass, canvas prints, `LAYERS` / `LAYER_WINDOWS` / `buildSubject` / `applyExplosion`). Rewrite `src/textures.js` to match. Do not ship the keyboard example unless the title is a keyboard.
+6. Generate chapter and callout copy from the layers using [references/section-recipes.md](references/section-recipes.md). Write `src/config/site.js` so it satisfies [references/content-schema.md](references/content-schema.md).
+7. Set `index.html` `<title>` to the site title (also set from `site.js` at runtime).
+8. Keep the template stacks. See [references/animations.md](references/animations.md) and [references/renderer.md](references/renderer.md). Do not add another library. Do not delete the light rig, PMREM, or shadow map.
 9. Run `npm install && npm run dev` in the output directory.
-10. Check the result against the lists at the end of [references/visual-system.md](references/visual-system.md) and [references/realism.md](references/realism.md). A chrome sphere in a black void is a failed run.
-11. Tell the user: title, colors used, scene recipe, config path (`src/config/site.ts`), and that copy, colors, and the recipe are edited there.
+10. From the **output directory**, run the screenshot audit in this skill folder against the dev server: `npm i -D playwright-core && node <skill-root>/scripts/shoot.mjs --url <dev-url>`. `<skill-root>` is the folder that contains this `SKILL.md`. Then check the hero against [references/visual-system.md](references/visual-system.md) and [references/realism.md](references/realism.md). A box grid, a chrome sphere, or a spinning primitive is a failed run.
+11. Tell the user: title, the object you modeled, its layers, colors used, config path (`src/config/site.js`), and that copy is edited in `site.js` while the 3D object is edited in `subject.js`.
 
 ## What the page is
 
-The template already composes the page. Your job is to fill it, not to restyle it or rebuild the renderer. Read [references/visual-system.md](references/visual-system.md), [references/scene.md](references/scene.md), and [references/realism.md](references/realism.md) before writing config.
+The template already composes the stage. Your job is to fill the subject and the copy, not to restyle the overlays or rebuild the renderer. Read [references/visual-system.md](references/visual-system.md), [references/scene.md](references/scene.md), and [references/realism.md](references/realism.md) before writing files.
 
-- One fixed full-viewport WebGPU canvas. Six HTML bands over it: hero, about, features, gallery, testimonials, CTA.
-- Each band carries a `tone` — `base`, `surface`, or `inverse`. No two adjacent bands share one, and exactly one band is `inverse`.
-- One `display` headline (hero), one `statement` heading (about), everything else at `heading`.
-- Card surfaces, borders, and hover tints derive from the palette in CSS. You supply six hexes and a recipe, nothing else.
-- The 3D scene is a procedural **studio still life** tinted from those hexes: ground, cyclorama, TSL IBL, physical materials. No photographs, no GLTFs, no HDRIs. A single primitive in a void is a failed run.
+- One fixed full-viewport WebGL canvas. Overlay UI in reserved zones: chrome, hero, left layer rail, right chapter panel, projected callouts, hint, colophon. An invisible 620vh `.scroll-track` is the only document flow.
+- One named physical object, 4–7 layers, 150–400 meshes, canvas-printed details. No photographs, no GLTFs, no HDRIs.
+- One scroll scalar `p` drives camera, explosion, lights, and UI gates. See [references/choreography.md](references/choreography.md).
+- Palette is six hexes. CSS tokens and the light rig bind to them. You supply the hexes and the object, nothing else.
 
 ## Hard rules
 
 - Title is required. No title → ask and stop.
-- All user-facing copy, colors, nav, CTAs, and `scene.recipe` live in `src/config/site.ts` only.
+- Name a real object before scaffolding. Abstract titles still get an artifact.
+- User-facing copy, colors, chapters, callouts, chrome live in `src/config/site.js` only.
+- The 3D object lives in `src/subject.js` + `src/textures.js`. Authored every run.
 - The palette must pass `scripts/check-palette.mjs`.
-- Import from `three/webgpu` and `three/tsl` only. Never the default `three` entry. Never GLSL. Never `ShaderMaterial`.
-- One `<Canvas>`, one `WebGPURenderer`. Construct it only in `src/scene/createWebGpuRenderer.ts`.
-- No OrbitControls. No `@react-three/drei`. No GLTF/HDRI/Pexels downloads.
-- Single page only. Hash links, no React Router.
-- Keep Lenis, Motion (`motion/react`), and GSAP ScrollTrigger for HTML. Keep Three/TSL for 3D. Do not add another library.
-- GSAP never tweens Three objects. R3F `useFrame` never owns Lenis.
-- `prefers-reduced-motion`: freeze the canvas after one still frame.
-- Keep `src/scene/studio/` mounted. Recipes are still lifes (see [references/realism.md](references/realism.md)). Do not reduce a recipe to one sphere, box, or plane.
+- Import from `three` and `three/addons/...`. Never `three/webgpu`. Never TSL. Never `ShaderMaterial`.
+- One `<canvas id="gl">`, one `WebGLRenderer`. Construct it only in `src/main.js`.
+- `RoomEnvironment` via `PMREMGenerator` is required. Shadow maps are required.
+- No OrbitControls. No `@react-three/drei`. No `@react-three/fiber`. No GLTF/HDRI/Pexels downloads.
+- Canvas textures are required for printed surfaces. Downloaded image files are forbidden.
+- Single page only. No React Router. No React.
+- Keep Lenis and GSAP ScrollTrigger. Do not add Motion, R3F, or another library.
+- GSAP never tweens Three objects. The only tween is `state.p`.
+- `prefers-reduced-motion`: freeze on the exploded frame (`p = 1`).
+- Target 150–400 meshes. Under 40 is a failed run. `window.__audit()` must report `shadowCasters > 0`.
 
 ## Common mistakes
 
-- Hardcoding a headline in `Hero.tsx`
-- Adding `bg-[#1c1714]` or any hand-picked surface color to a section instead of using `surface` / `raised` / `hairline`
-- Giving every band the same tone, so six identical blocks stack up
-- Picking an accent one hue-step from primary, so the page reads as a single color
+- Shipping the keyboard example for a watch / camera / lantern title
+- Picking `lattice` or any leftover recipe enum instead of modeling the object
+- Hardcoding a headline in `index.html` instead of `site.js`
+- Painting overlay backgrounds opaque so the canvas dies
+- Putting chapter copy on top of the subject (zones exist so you don't)
+- Inventing a complementary accent "for contrast" when the object is one chroma — that is the cyan cube on the orange keyboard
 - Reaching for a dark palette when the title cues a light one
-- Importing from `three` instead of `three/webgpu`
-- Writing a GLSL `ShaderMaterial` "because TSL looked harder"
+- Importing from `three/webgpu` or writing TSL
 - Adding OrbitControls so "the user can inspect the model"
-- Loading a GLTF or HDRI instead of using the recipe table
-- Deleting `StudioSet` / `StudioEnvironment` or swapping physical materials for a flat color
-- Replacing a recipe with one sphere, one box, or one plane
-- Adding a second Canvas as a WebGL fallback
-- Leaving lorem ipsum in `site.ts`
+- Loading a GLTF or HDRI instead of building the parts table
+- Deleting the shadow plane or disabling `shadowMap`
+- Replacing the subject with one sphere, one box, or a grid of boxes
+- Adding a second canvas
+- Leaving lorem ipsum in `site.js`
+- Idle-spinning the model (`rotation.y += delta`)
 
 | Excuse | Reality |
 |---|---|
-| "I'll add copy in the component and move it later" | Copy in JSX is a failed run. Put it in `site.ts` first. |
+| "I'll add copy in the HTML and move it later" | Copy in HTML is a failed run. Put it in `site.js` first. |
 | "No title, I'll name it Untitled" | Stop and ask. Title is required. |
-| "User skipped colors so I'll use Tailwind defaults" | Pick a mood palette from `color-system.md`. |
+| "User skipped colors so I'll use Tailwind defaults" | There is no Tailwind. Pick a mood palette from `color-system.md`. |
 | "The palette looks fine to me" | Run the checker. |
-| "This section needs a slightly different background" | That is what `tone` is for. |
-| "Dark always looks more premium" | Five of nine moods are light. Pick by the title's cue. |
-| "Router will make it more complete" | Single page only. Anchor links. |
-| "I'll write GLSL, TSL is new" | TSL only. GLSL will not run on WebGPU. |
+| "Accent should be 60° away or it looks cheap" | One chroma against neutrals. A second hue only if the object has one. |
+| "Dark always looks more premium" | Five of ten moods are light. Pick by the title's cue. |
+| "A lattice is a valid product visualization" | A lattice is how the last run failed. Model the object. |
+| "I'll write GLSL / TSL, it's more advanced" | WebGL + PhysicalMaterial. TSL is not in this stack. |
 | "OrbitControls is standard in Three.js examples" | It steals the scroll. Forbidden. |
-| "A GLTF will look more real" | A GLTF in a void still looks fake. Keep the studio set and the recipe still life. |
-| "I'll add drei Environment for realism" | `StudioEnvironment` is the IBL. Drei is forbidden. |
-| "One sphere is enough, it's cleaner" | One primitive in a void is the failure this skill prevents. Restore the still life. |
-| "I'll delete the floor to see the model better" | No floor means it floats. That is a failed run. |
-| "I'll add a WebGL Canvas just in case" | One Canvas. `WebGPURenderer` already falls back. |
+| "A GLTF will look more real" | A GLTF in a void still looks fake. Build the parts table and keep the rig. |
+| "I'll add drei Environment for realism" | `RoomEnvironment` is the IBL. Drei is forbidden. |
+| "One sphere is enough, it's cleaner" | One primitive is the failure this skill prevents. |
+| "I'll delete the floor to see the model better" | No shadow pool means it floats. Failed run. |
+| "I'll keep the keyboard and recolor it" | Wrong object. Rewrite `subject.js`. |
+| "Under 40 meshes is fine, it's stylized" | Under 40 is a sculpture. Failed run. |
 
-**When the canvas is black, double-scrolling, or the scene ignores the palette:** [references/gotchas.md](references/gotchas.md) first.
+**When the canvas is black, double-scrolling, or type sits on the subject:** [references/gotchas.md](references/gotchas.md) first.

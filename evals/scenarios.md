@@ -1,6 +1,6 @@
 # Evaluation scenarios
 
-Technique-skill checks. An agent following this skill should pass all five.
+Technique-skill checks. An agent following this skill should pass all six.
 
 ## 1. Happy path
 
@@ -8,20 +8,21 @@ Technique-skill checks. An agent following this skill should pass all five.
 
 **Pass when:**
 
-- Project is scaffolded outside the skill folder
-- `src/config/site.ts` has title `Harbor & Pine`
+- Project is scaffolded outside the skill folder from `templates/3d-stage/`
+- `src/config/site.js` has title `Harbor & Pine`
 - `colors.primary` is `#2F4F3E`
 - Remaining colors are derived, not left empty
-- `scene.recipe` is set (`terrain` for pine/harbor, or another cue-table match — not invented)
-- `node scripts/check-palette.mjs` passes on the six values in `site.ts`
-- No `.jpg`, `.png`, `.webp`, `.gltf`, `.glb`, or `.hdr` files were written
+- The named object is a real artifact from that world (compass, lantern, topographic instrument — **not** a box grid and **not** the keyboard example)
+- `src/subject.js` exports `LAYERS`, `LAYER_WINDOWS`, `buildSubject`, `applyExplosion`
+- `node scripts/check-palette.mjs` passes on the six values in `site.js`
+- No `.jpg`, `.png`, `.webp`, `.gltf`, `.glb`, or `.hdr` files were written (canvas textures in JS are fine)
 - `index.html` title is `Harbor & Pine`
-- Components were not rewritten with hardcoded marketing copy
-- The app imports from `three/webgpu` / `three/tsl`, not default `three`
+- Overlays were not rewritten with hardcoded marketing copy
+- The app imports from `three` and `three/addons/...`, not `three/webgpu`
 
 ## 2. Missing title
 
-**User:** `Make me a fancy WebGPU website in teal`
+**User:** `Make me a fancy 3D website in teal`
 
 **Pass when:**
 
@@ -37,8 +38,9 @@ Technique-skill checks. An agent following this skill should pass all five.
 
 - Title is `Night Market Ramen`
 - Palette comes from [color-system.md](../references/color-system.md) (`nocturnal` for night, or `solar` only if the agent argues warmth — not Tailwind default blue)
-- Recipe comes from [scene.md](../references/scene.md) (`field` for night, not a custom particle system)
-- `site.ts` is complete (hero, about, 3 features, 4 gallery items, 3 testimonials, CTA, `scene.recipe`)
+- The object is a real artifact (a ramen bowl and noren, a noodle cart, a lantern — **not** `field`, **not** a particle system, **not** the keyboard)
+- `site.js` is complete (hero, 6 chapters, callouts, colophon)
+- `accent` is in the primary family (≤ 30°), not a complementary "pop" color
 - No image URLs and no downloaded assets
 
 ## 4. Composition
@@ -49,32 +51,45 @@ This is the scenario a weak 3D template fails: a black canvas, OrbitControls fig
 
 **Pass when:**
 
-- Palette is `terrain` (travel cue), not a brown one-hue palette, and the checker passes
-- Accent hue is at least 60° from primary
-- Recipe is `terrain`
-- Every section carries an explicit `tone`
-- No two adjacent sections share a tone
-- Exactly one section is `inverse`
-- `about.title` is the only heading rendered at `statement` size
-- One `<Canvas>` only — no second WebGL canvas
-- No `OrbitControls`, no `ShaderMaterial`, no GLSL strings, no `from 'three'`
-- No component was edited to add a background color, a border color, or a font size
-- Hero scrims stay light enough that the canvas is visible
-- `StudioSet` and `StudioEnvironment` are still imported in `Scene.tsx`
+- Palette is `terrain` (travel cue), not a brown one-hue-with-cyan palette, and the checker passes
+- Accent hue is within 30° of primary
+- The object is a travel artifact (sextant, compass, field camera), modeled in `subject.js`
+- Overlay zones match [visual-system.md](../references/visual-system.md): hero bottom-left, chapter right, rail left. No feature cards, no testimonials, no gallery tiles
+- One canvas only — no second WebGL canvas
+- No `OrbitControls`, no `ShaderMaterial`, no GLSL strings, no `three/webgpu`
+- No overlay was given an opaque background that hides the canvas
+- `RoomEnvironment` via `PMREMGenerator` is still in `main.js`
+- `renderer.shadowMap.enabled === true`
 
-## 5. Realism (the ECLIPSE failure)
+## 5. Realism (the keyboard-as-boxes failure)
 
-**User:** `Create a 3D animated site titled Eclipse, a watch manufacture`
+**User:** `Create a 3D animated site titled Mechanical — Inside the Keyboard`
 
-This is the scenario the first generated site failed: a chrome sphere spinning in a black void, no floor, no reflections, 3D gone by the About band.
+This is the scenario the skill-built site failed: a 6×6 lattice of pastel boxes, copy about keycaps, no explosion.
 
 **Pass when:**
 
-- Recipe is `orb` (watch / time / eclipse / maison cues)
-- `src/scene/Scene.tsx` still mounts `StudioSet` and `StudioEnvironment`
-- `Orb.tsx` is a still life (pedestal + body + rings + jewels), not a single `<sphereGeometry>`
-- Materials come from `src/scene/studio/materials.ts` (`MeshPhysicalNodeMaterial`)
-- Renderer sets `ACESFilmicToneMapping`
+- The subject is a keyboard you can name in the hero without reading the headline
+- `LAYERS` includes keycaps, switches, and a case (or equivalent strata) — 4–7 layers
+- Keys come from a layout table, not 36 independent boxes
+- Caps use beveled `ExtrudeGeometry`, not `boxGeometry`
+- Canvas textures stamp legends (and preferably a PCB/plate map)
+- `window.__audit().meshes >= 40` (target 150–400) and `shadowCasters > 0`
+- Scroll peels layers via `LAYER_WINDOWS`; there is no idle `rotation.y += delta`
 - No `.hdr`, `.gltf`, `.glb`, and no `@react-three/drei`
-- After `npm run dev`, the hero shows a floor or pedestal and a studio reflection on metal — not a primitive in a void
-- About / Features still show some of the canvas (bands are not fully opaque)
+- After `npm run dev`, the hero shows a real shadow and a studio reflection on coated plastic
+
+## 6. Subject naming (the watch title)
+
+**User:** `Create a 3D animated site titled Eclipse, a watch manufacture`
+
+**Pass when:**
+
+- The agent names a watch (crystal, hands, dial, movement, case / caseback) before scaffolding
+- `src/subject.js` is rewritten — the keyboard example is gone
+- At least four layers explode on scroll
+- Small parts exist (crown, lugs, or screws)
+- Dial indexes or a logo are canvas-printed
+- Mesh count ≥ 40, shadow casters > 0
+- `scripts/shoot.mjs --url <dev>` exits 0
+- Palette is `luxe` (watch / manufacture cue) unless the user supplied colors

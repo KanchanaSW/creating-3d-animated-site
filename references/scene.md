@@ -1,73 +1,49 @@
 # Scene
 
-One architecture. Five still-life recipes. A studio that is always on. The agent picks a recipe; it does not invent a new scene graph and it does not strip the room.
+One architecture. One named subject. A light rig that is always on.
 
-Read [realism.md](realism.md) before editing any file under `src/scene/`.
+The agent **models the object in the title**. It does not pick a recipe from an enum. The old `orb | lattice | field | ribbon | terrain` table is gone — those still lifes are what made a keyboard ship as a box grid.
 
-## Pick a recipe
+Read these before writing any scene file:
 
-Classify the title. Copy the matching row. Fallback: `lattice`.
+1. [subject.md](subject.md) — how to name, layer, and build the object into `src/subject.js`
+2. [renderer.md](renderer.md) — WebGL, ACES, PMREM `RoomEnvironment`, shadow maps, the five-light rig
+3. [choreography.md](choreography.md) — one scrubbed scalar `p`, camera arc, explosion windows, overlay gates
+4. [realism.md](realism.md) — the pass/fail photograph contract
 
-| Recipe | Title cues | Still life on screen |
-|---|---|---|
-| `orb` | luxe, jewelry, atelier, maison, interiors, watch, time, horology, eclipse | Pedestal, metal body, rings, jewels |
-| `lattice` | lab, product, platform, ai, app, digital | Mixed-height columns on the floor |
-| `field` | night, space, energy, noir, moon | Planet, ring, dust field |
-| `ribbon` | fashion, motion, studio, couture | Volume tubes on curves |
-| `terrain` | travel, earth, organic, garden, trail, harbor, pine | Multi-octave ground and horizon |
+## What is on screen
 
-Write the choice as `scene: { recipe: 'orb' }` in `site.ts`. Do not add extra recipe keys.
+- One fixed full-viewport canvas (`#stage > #gl`).
+- The subject from `buildSubject({ colors })`, sitting in a fogged room with a contact-shadow pool.
+- Overlay UI in reserved corners (hero, chapter, rail, hint, colophon). The object keeps the center.
 
-Palette (from [color-system.md](color-system.md)) and recipe are independent. A coastal palette can sit on `terrain`; a luxe palette should sit on `orb`.
+## What you write per run
 
-## Camera
+- `src/subject.js` — the whole object. Layers, table, bevels, canvas prints, explode offsets.
+- `src/textures.js` — canvas generators for whatever is printed on that object.
+- `src/config/site.js` — colors, chapter copy, callouts. Recolors lights and materials.
 
-Six poses, one per band, lerped from `scrollSnapshot.progress` (0 at the top of the page, 1 at the bottom). Implementation: `src/scene/useScrollCamera.ts`.
+## What you do not write per run
 
-The camera stays in the room. Last pose `z` is ~5.5, not 8+. Look-at is `[0, -0.38, 0]` so the still life sits in the **upper half** of the hero — above the type — with the floor still in frame.
+- A second canvas
+- A new renderer
+- A new camera-pose table (tune start/mid/end only if the object's bounds demand it)
+- A sixth overlay that sits on the subject
+- A GLTF, HDRI, or image download
+- `OrbitControls`, drei, R3F, WebGPU, TSL
 
-| Band | Position | Look at |
-|---|---|---|
-| hero | `0, 0.92, 3.65` | `0, -0.38, 0` |
-| about | `1.28, 1.02, 3.35` | `0, -0.38, 0` |
-| features | `0.18, 1.35, 4.55` | `0, -0.38, 0` |
-| gallery | `-1.18, 0.88, 3.25` | `0, -0.38, 0` |
-| stories | `0.3, 0.72, 4.95` | `0, -0.38, 0` |
-| contact | `0, 1.42, 5.45` | `0, -0.38, 0` |
+## Camera (do not invent a new table)
 
-FOV is 36 (product-shot), not a wide demo lens. While `#gallery` is in view, `scrollSnapshot.galleryBeat` (0–1) drives a morph inside the recipe. That is the gallery — not four photographs.
-
-Do not add OrbitControls. Do not keyframe a new pose per run.
+FOV 32. Three waypoints, pointer parallax, look-at near the origin. Full numbers live in [choreography.md](choreography.md). Last pose `z` stays under ~3.5 on desktop — past that the object is a speck.
 
 ## Studio (required)
 
-Always mounted. Not optional per brand.
+Always mounted in `main.js`. Not optional per brand.
 
-- `StudioEnvironment` — TSL gradient IBL on `scene.environmentNode`. Metals reflect this.
-- `StudioSet` — cyclorama, stone apron, glossy inner disk, contact shadow.
-- Lights — hemisphere + near-white key (`foreground`) + cool fill (`accent`) + warm rim/spot (`primary` / `secondary`).
-- ACES tone mapping + exposure on the renderer.
+- `RoomEnvironment` via `PMREMGenerator` at intensity 0.55
+- Hemisphere + near-white shadow-casting key + primary rim + fill + underglow
+- Fog matched to `colors.background`
+- Radial canvas shadow plane
+- CSS vignette + grain
 
-Do not add an HDRI `Environment`. Do not delete the set to "see the model better".
-
-## Recipes live in `src/scene/recipes/`
-
-Each file exports a still life that reads `siteConfig.colors` and `scrollSnapshot.galleryBeat`. Idle drift belongs on the subject group in `Scene.tsx` (~0.045 rad/s), not on the studio, and is not duplicated five times.
-
-Lite counts on small viewports (see each file). Do not load textures.
-
-Materials come from `src/scene/studio/materials.ts` (`MeshPhysicalNodeMaterial`, TSL grain, clearcoat). Do not replace them with a flat `colorNode` on `MeshStandardNodeMaterial`.
-
-## What you may change per run
-
-- `scene.recipe` in `site.ts`
-- The six hexes (which recolor lights, IBL, and materials)
-
-## What you may not change per run
-
-- Number of canvases
-- Import paths
-- Camera pose table
-- Removing `StudioSet`, `StudioEnvironment`, or ACES tone mapping
-- Adding a GLTF, a texture, an HDRI, or a sixth recipe "for this brand"
-- Collapsing a recipe to a single primitive
+Do not add an HDRI. Do not delete the shadow plane to "see the model better".

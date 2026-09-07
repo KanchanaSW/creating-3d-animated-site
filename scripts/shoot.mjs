@@ -97,6 +97,11 @@ if (!first.chapters?.length) {
   fail('no chapters on window.__audit()')
   failed += 1
 }
+const VIEWS = ['dossier', 'plinth', 'vitrine', 'atelier', 'folio']
+if (first.view && !VIEWS.includes(first.view)) {
+  fail(`unknown view ${first.view}`)
+  failed += 1
+}
 
 const chapters = first.chapters?.length ? first.chapters : [{ id: 'hero', at: 0 }]
 for (const chapter of chapters) {
@@ -120,5 +125,5 @@ if (failed) {
   process.exit(1)
 }
 
-console.log(`\npass  meshes=${first.meshes} shadowCasters=${first.shadowCasters} materials=${first.materials}`)
+console.log(`\npass  meshes=${first.meshes} shadowCasters=${first.shadowCasters} materials=${first.materials} view=${first.view ?? 'unset'}`)
 console.log(`frames written to ${OUT}`)

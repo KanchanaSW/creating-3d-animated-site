@@ -13,6 +13,7 @@ Export `siteConfig` from `src/config/site.js`.
 | Field | Notes |
 |---|---|
 | `title` | Site name. Also used for `index.html` and `document.title`. |
+| `view` | One of `dossier`, `plinth`, `vitrine`, `atelier`, `folio`. See [views.md](views.md). Required. |
 | `tagline` | Short supporting line (6–12 words). Goes in the description meta. |
 | `mark` | 2–3 letter stamp in the chrome box. |
 | `wordmark` | Word next to the mark. Usually the first word of the title. |
@@ -62,7 +63,7 @@ See [color-system.md](color-system.md). One dominant chroma against a neutral gr
 
 ### Forbidden fields
 
-Do not add `image`, `src`, `photographer`, GLTF paths, HDRI URLs, `scene.recipe`, `nav`, `tone`, testimonials, or a gallery of tiles. Those belonged to the old band template.
+Do not add `image`, `src`, `photographer`, GLTF paths, HDRI URLs, `scene.recipe`, `nav`, `tone`, testimonials, or a gallery of tiles. Those belonged to the old band template. Do not add a freeform `layout` string — use `view`.
 
 ## Generation rules
 
@@ -70,4 +71,5 @@ Do not add `image`, `src`, `photographer`, GLTF paths, HDRI URLs, `scene.recipe`
 - Do not move copy into `index.html` after generating it. The HTML file is a shell of `data-ui` hooks.
 - Do not add fields `main.js` does not read.
 - Keep hex colors as `#RRGGBB`, and run `scripts/check-palette.mjs` before writing them.
+- `view` must be one of the five names in [views.md](views.md). Pick it from the object; do not omit it.
 - Chapter `id`s in the middle of the list must equal `LAYERS` in `subject.js`.

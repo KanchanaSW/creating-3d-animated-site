@@ -10,6 +10,7 @@ Technique-skill checks. An agent following this skill should pass all six.
 
 - Project is scaffolded outside the skill folder from `templates/3d-stage/`
 - `src/config/site.js` has title `Harbor & Pine`
+- `view` is set (a harbor instrument is `plinth` or `vitrine`, not omitted)
 - `colors.primary` is `#2F4F3E`
 - Remaining colors are derived, not left empty
 - The named object is a real artifact from that world (compass, lantern, topographic instrument — **not** a box grid and **not** the keyboard example)
@@ -39,7 +40,8 @@ Technique-skill checks. An agent following this skill should pass all six.
 - Title is `Night Market Ramen`
 - Palette comes from [color-system.md](../references/color-system.md) (`nocturnal` for night, or `solar` only if the agent argues warmth — not Tailwind default blue)
 - The object is a real artifact (a ramen bowl and noren, a noodle cart, a lantern — **not** `field`, **not** a particle system, **not** the keyboard)
-- `site.js` is complete (hero, 6 chapters, callouts, colophon)
+- `site.js` is complete (hero, 6 chapters, callouts, colophon, `view`)
+- `view` is `plinth` (a bowl as a still-life artifact) or `atelier` (a kitchen stall) — not `dossier`
 - `accent` is in the primary family (≤ 30°), not a complementary "pop" color
 - No image URLs and no downloaded assets
 
@@ -54,7 +56,8 @@ This is the scenario a weak 3D template fails: a black canvas, OrbitControls fig
 - Palette is `terrain` (travel cue), not a brown one-hue-with-cyan palette, and the checker passes
 - Accent hue is within 30° of primary
 - The object is a travel artifact (sextant, compass, field camera), modeled in `subject.js`
-- Overlay zones match [visual-system.md](../references/visual-system.md): hero bottom-left, chapter right, rail left. No feature cards, no testimonials, no gallery tiles
+- Overlay zones match the chosen view in [views.md](../references/views.md). For `dossier`: hero bottom-left, chapter right, rail left. No feature cards, no testimonials, no gallery tiles
+- `site.js` sets `view` (a travel instrument is `plinth` or `vitrine`, not a leftover `dossier` from the keyboard template)
 - One canvas only — no second WebGL canvas
 - No `OrbitControls`, no `ShaderMaterial`, no GLSL strings, no `three/webgpu`
 - No overlay was given an opaque background that hides the canvas
@@ -93,3 +96,4 @@ This is the scenario the skill-built site failed: a 6×6 lattice of pastel boxes
 - Mesh count ≥ 40, shadow casters > 0
 - `scripts/shoot.mjs --url <dev>` exits 0
 - Palette is `luxe` (watch / manufacture cue) unless the user supplied colors
+- `view` is `plinth` (the watch as an artifact), not `dossier`

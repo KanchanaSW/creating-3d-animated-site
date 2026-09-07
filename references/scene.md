@@ -9,32 +9,33 @@ Read these before writing any scene file:
 1. [subject.md](subject.md) — how to name, layer, and build the object into `src/subject.js`
 2. [renderer.md](renderer.md) — WebGL, ACES, PMREM `RoomEnvironment`, shadow maps, the five-light rig
 3. [choreography.md](choreography.md) — one scrubbed scalar `p`, camera arc, explosion windows, overlay gates
-4. [realism.md](realism.md) — the pass/fail photograph contract
+4. [views.md](views.md) — which overlay/camera/type pairing this build wears
+5. [realism.md](realism.md) — the pass/fail photograph contract
 
 ## What is on screen
 
 - One fixed full-viewport canvas (`#stage > #gl`).
 - The subject from `buildSubject({ colors })`, sitting in a fogged room with a contact-shadow pool.
-- Overlay UI in reserved corners (hero, chapter, rail, hint, colophon). The object keeps the center.
+- Overlay UI in reserved corners that follow the active view (hero, chapter, rail, hint, colophon). The object keeps that view’s zone.
 
 ## What you write per run
 
 - `src/subject.js` — the whole object. Layers, table, bevels, canvas prints, explode offsets.
 - `src/textures.js` — canvas generators for whatever is printed on that object.
-- `src/config/site.js` — colors, chapter copy, callouts. Recolors lights and materials.
+- `src/config/site.js` — colors, view, chapter copy, callouts. Recolors lights and materials.
 
 ## What you do not write per run
 
 - A second canvas
 - A new renderer
-- A new camera-pose table (tune start/mid/end only if the object's bounds demand it)
+- A new camera-pose table (tune the chosen view’s start/mid/end only if the object’s bounds demand it)
 - A sixth overlay that sits on the subject
 - A GLTF, HDRI, or image download
 - `OrbitControls`, drei, R3F, WebGPU, TSL
 
-## Camera (do not invent a new table)
+## Camera (do not invent a sixth view)
 
-FOV 32. Three waypoints, pointer parallax, look-at near the origin. Full numbers live in [choreography.md](choreography.md). Last pose `z` stays under ~3.5 on desktop — past that the object is a speck.
+FOV 32. Three waypoints per view, pointer parallax, look-at authored in `src/views.js`. Full numbers live in [views.md](views.md) and [choreography.md](choreography.md). Last pose `z` stays under ~3.5 on desktop except `plinth` (~4.0, high angle).
 
 ## Studio (required)
 

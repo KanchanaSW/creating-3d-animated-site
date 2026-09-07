@@ -1,6 +1,7 @@
 export const siteConfig = {
   title: 'Mechanical — Inside the Keyboard',
   tagline: 'A mechanical keyboard, opened layer by layer',
+  view: 'dossier',
   mark: 'MEC',
   wordmark: 'Mechanical',
   badge: '60%',

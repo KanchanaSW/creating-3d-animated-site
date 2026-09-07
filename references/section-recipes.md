@@ -14,7 +14,7 @@ There are no scrolling HTML bands. Copy lives in overlay zones that `main.js` hy
 | `badge` | a spec or year, not "60%" unless that is the object (keyboard form factor) |
 | `hint` | 2–4 words, a verb (`Scroll to disassemble`) |
 | `hero.eyebrow` | 3–5 words, mono, uppercase |
-| `hero.headline` | 1–3 words. Renders at Bebas ~148px. Long words will dominate |
+| `hero.headline` | 1–3 words. Size follows the view (`dossier` ~148px; `plinth` / `folio` smaller). Long words will dominate |
 | `hero.subtitle` | 2–6 words, uppercase, tracking out |
 | `hero.lede` | 28–45 words |
 | `chapters[].kicker` | 3–6 words |

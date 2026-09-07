@@ -15,8 +15,9 @@ When the canvas is black, the scroll fights the mouse, or type sits on the subje
 | Double-smoothing on the page | Lenis `autoRaf: true` plus the GSAP ticker | `autoRaf` stays off. Only the ticker calls `lenis.raf`. |
 | Camera ignores scroll | GSAP tweening `camera.position` | Write `p` into `state`; `frameFromProgress` reads it. |
 | Explosion pops all at once | Every layer window is `[0, 1]` | Restore overlapping windows from [subject.md](subject.md). |
-| Type sits on the keyboard / watch | Hero too wide, or camera start too centered | Keep hero bottom-left; push `camStart.x` positive so the object sits right of the headline. |
-| Chapter panel covers the subject | Camera end too far right, or chapter not `.is-on` gated | Chapter is right-center; `camEnd.x` is negative. Gates in [choreography.md](choreography.md). |
+| Type sits on the keyboard / watch | Hero too wide, or camera start not offset for the view | Keep type in that view’s reserved zone ([views.md](views.md)); offset `camStart` / `camEnd` on the active row in `views.js`. |
+| Chapter panel covers the subject | Camera end in the chapter’s zone, or chapter not `.is-on` gated | Park the object in the view’s object zone. Gates in [choreography.md](choreography.md). |
+| Every generated site looks like the keyboard demo | `view` left as `dossier` for a watch / bowl / journal | Pick `plinth` / `vitrine` / `atelier` / `folio` from the object. |
 | Overlay clicks never reach the rail | Missing `pointer-events: none` on hero/chapter | Restore it. Rail buttons must keep pointer events. |
 | Scene is white/orange regardless of title | Hardcoded material colors in `subject.js` | Bind factories to `colors` from `buildSubject({ colors })`. |
 | Cyan cube in an orange scene | Accent forced 60° from primary | One chroma. `accent` may equal `primary`. |

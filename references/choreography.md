@@ -34,7 +34,7 @@ function frameFromProgress(p) {
   underglow.intensity = 1.6 + p * 2.2
   shadow.material.opacity = 0.55 - p * 0.22
   applyExplosion(subject, p)
-  subject.rotation.y = degToRad(-8) + p * 0.35
+  subject.rotation.y = degToRad(view.yawStart + p * view.yawTravel)
   updateUI(p)
 }
 
@@ -50,7 +50,9 @@ No elastic. No bounce. No idle spin.
 
 FOV **32°**, near 0.1, far 40. Product-shot lens, not a demo wide-angle.
 
-Three waypoints, different on mobile (`<860px`):
+Three waypoints live in [views.md](views.md) / `src/views.js`, different on mobile (`<860px`). `setCameraRigs()` copies the active view’s row. Do not paste a new table into `main.js`.
+
+`dossier` (the original rig) for reference:
 
 | | Desktop | Mobile |
 |---|---|---|
@@ -58,7 +60,7 @@ Three waypoints, different on mobile (`<860px`):
 | mid | `0.35, 2.55, 3.45` | `0.2, 2.9, 3.7` |
 | end | `-2.15, 2.95, 2.55` | `-1.55, 3.2, 3.05` |
 
-Look-at lerps `(0, 0.05, 0.02) → (0, 0.12, 0)`. The subject sits in the open center; copy lives in the corners. If type lands on the object, the camera is too centered — push start to the right and end to the left so the chapter panel on the right stays clear.
+Look-at, yaw, and the other four views are in `views.js`. The subject sits in that view’s object zone; copy lives in that view’s reserved corners. If type lands on the object, the camera is too centered for the view — offset that view’s start/end, do not invent a sixth layout.
 
 Pointer parallax is a nudge, not orbit. No `OrbitControls`.
 

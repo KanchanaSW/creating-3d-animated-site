@@ -6,6 +6,7 @@ import Lenis from 'lenis'
 import { siteConfig } from './config/site.js'
 import { applyExplosion, buildSubject } from './subject.js'
 import { shadowTexture } from './textures.js'
+import { getView } from './views.js'
 
 gsap.registerPlugin(ScrollTrigger)
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
@@ -13,6 +14,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
 const colors = siteConfig.colors
 const CHAPTERS = siteConfig.chapters
 const CALLOUTS = siteConfig.callouts
+const view = getView(siteConfig.view)
 
 function applyTokens() {
   const root = document.documentElement
@@ -28,7 +30,32 @@ function applyTokens() {
   if (desc) desc.setAttribute('content', siteConfig.tagline)
 }
 
+function loadViewFonts(href) {
+  const links = [...document.querySelectorAll('link[rel="stylesheet"]')]
+  if (links.some((link) => link.href === href || link.getAttribute('href') === href)) {
+    return document.fonts.ready
+  }
+  return new Promise((resolve) => {
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = href
+    link.onload = () => resolve()
+    link.onerror = () => resolve()
+    document.head.appendChild(link)
+  }).then(() => document.fonts.ready)
+}
+
+function applyView() {
+  document.body.classList.add(`view--${view.id}`)
+  const root = document.documentElement
+  root.style.setProperty('--font-display', view.fonts.display)
+  root.style.setProperty('--font-body', view.fonts.body)
+  root.style.setProperty('--font-meta', view.fonts.meta)
+  return loadViewFonts(view.fonts.href)
+}
+
 applyTokens()
+const viewFonts = applyView()
 
 const ui = {
   mark: document.querySelector('[data-ui="mark"]'),
@@ -98,15 +125,12 @@ const lookEnd = new THREE.Vector3(0, 0.12, 0)
 
 function setCameraRigs() {
   const mobile = window.innerWidth < 860
-  if (mobile) {
-    camStart.set(1.35, 2.35, 3.55)
-    camMid.set(0.2, 2.9, 3.7)
-    camEnd.set(-1.55, 3.2, 3.05)
-  } else {
-    camStart.set(2.05, 1.85, 3.25)
-    camMid.set(0.35, 2.55, 3.45)
-    camEnd.set(-2.15, 2.95, 2.55)
-  }
+  const rig = mobile ? view.camera.mobile : view.camera.desktop
+  camStart.fromArray(rig.start)
+  camMid.fromArray(rig.mid)
+  camEnd.fromArray(rig.end)
+  lookStart.fromArray(rig.lookStart)
+  lookEnd.fromArray(rig.lookEnd)
 }
 setCameraRigs()
 camera.position.copy(camStart)
@@ -250,7 +274,7 @@ function frameFromProgress(p) {
   shadow.material.opacity = 0.55 - p * 0.22
   if (subject) {
     applyExplosion(subject, p)
-    subject.rotation.y = THREE.MathUtils.degToRad(-8) + p * 0.35
+    subject.rotation.y = THREE.MathUtils.degToRad(view.yawStart + p * view.yawTravel)
   }
   updateUI(p)
 }
@@ -342,6 +366,7 @@ window.__audit = () => {
     materials: materials.size,
     layers,
     p: state.p,
+    view: view.id,
     chapters: CHAPTERS.map((c) => ({ id: c.id, at: c.at })),
     shadowMaps: renderer.shadowMap.enabled,
   }
@@ -358,7 +383,7 @@ gsap.ticker.lagSmoothing(0)
 
 async function start() {
   try {
-    await document.fonts.ready
+    await viewFonts
   } catch {
     /* continue */
   }

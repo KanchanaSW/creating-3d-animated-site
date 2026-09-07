@@ -5,12 +5,12 @@ description: Use when the user wants a new single-page 3D animated website, Thre
 
 # Creating a 3D animated site
 
-Scaffold the bundled Vite template, then **model the named object** into `src/subject.js` and write copy plus colors into `src/config/site.js`. A persistent WebGL canvas fills the viewport. Overlay chapters ride a 620vh scroll track. Scroll peels the object apart layer by layer.
+Scaffold the bundled Vite template, then **model the named object** into `src/subject.js` and write copy, colors, and view into `src/config/site.js`. A persistent WebGL canvas fills the viewport. Overlay chapters ride a 620vh scroll track. Scroll peels the object apart layer by layer.
 
 ## Inputs
 
 - **Required:** `title`
-- **Optional:** colors (hex or names), output directory (default: kebab-case title at the workspace root)
+- **Optional:** colors (hex or names), **view** (`dossier` | `plinth` | `vitrine` | `atelier` | `folio`), output directory (default: kebab-case title at the workspace root)
 
 If the title is missing, ask once and stop. Do not invent a title. Do not scaffold.
 
@@ -20,30 +20,32 @@ Follow these steps in order. Do not skip.
 
 1. Confirm the title. **Name the physical object** it refers to, and list 4–7 layers that will separate on scroll. If the title is abstract, pick the nearest real artifact and commit to it before modeling. Read [references/subject.md](references/subject.md).
 2. Parse colors or choose a mood palette from [references/color-system.md](references/color-system.md). One dominant chroma against a neutral ground. A second hue only if the real object has one.
-3. Validate the palette: `node scripts/check-palette.mjs <background> <foreground> <primary> <secondary> <accent> <muted>`. All checks must pass before you write any config.
-4. Copy `templates/3d-stage/` to the output directory. Do not scaffold inside this skill folder.
-5. **Rewrite `src/subject.js`** for the named object (data table, beveled extrudes, detail pass, canvas prints, `LAYERS` / `LAYER_WINDOWS` / `buildSubject` / `applyExplosion`). Rewrite `src/textures.js` to match. Do not ship the keyboard example unless the title is a keyboard.
-6. Generate chapter and callout copy from the layers using [references/section-recipes.md](references/section-recipes.md). Write `src/config/site.js` so it satisfies [references/content-schema.md](references/content-schema.md).
-7. Set `index.html` `<title>` to the site title (also set from `site.js` at runtime).
-8. Keep the template stacks. See [references/animations.md](references/animations.md) and [references/renderer.md](references/renderer.md). Do not add another library. Do not delete the light rig, PMREM, or shadow map.
-9. Run `npm install && npm run dev` in the output directory.
-10. From the **output directory**, run the screenshot audit in this skill folder against the dev server: `npm i -D playwright-core && node <skill-root>/scripts/shoot.mjs --url <dev-url>`. `<skill-root>` is the folder that contains this `SKILL.md`. Then check the hero against [references/visual-system.md](references/visual-system.md) and [references/realism.md](references/realism.md). A box grid, a chrome sphere, or a spinning primitive is a failed run.
-11. Tell the user: title, the object you modeled, its layers, colors used, config path (`src/config/site.js`), and that copy is edited in `site.js` while the 3D object is edited in `subject.js`.
+3. **Pick a view** from [references/views.md](references/views.md). User `view` wins. Otherwise pick from the object (watch → `plinth`, machine → `dossier`, exhibit → `vitrine`, workshop → `atelier`, editorial → `folio`). Do not default every run to `dossier`.
+4. Validate the palette: `node scripts/check-palette.mjs <background> <foreground> <primary> <secondary> <accent> <muted>`. All checks must pass before you write any config.
+5. Copy `templates/3d-stage/` to the output directory. Do not scaffold inside this skill folder.
+6. **Rewrite `src/subject.js`** for the named object (data table, beveled extrudes, detail pass, canvas prints, `LAYERS` / `LAYER_WINDOWS` / `buildSubject` / `applyExplosion`). Rewrite `src/textures.js` to match. Do not ship the keyboard example unless the title is a keyboard.
+7. Generate chapter and callout copy from the layers using [references/section-recipes.md](references/section-recipes.md). Write `src/config/site.js` so it satisfies [references/content-schema.md](references/content-schema.md), including `view`.
+8. Set `index.html` `<title>` to the site title (also set from `site.js` at runtime).
+9. Keep the template stacks. See [references/animations.md](references/animations.md) and [references/renderer.md](references/renderer.md). Do not add another library. Do not delete the light rig, PMREM, or shadow map.
+10. Run `npm install && npm run dev` in the output directory.
+11. From the **output directory**, run the screenshot audit in this skill folder against the dev server: `npm i -D playwright-core && node <skill-root>/scripts/shoot.mjs --url <dev-url>`. `<skill-root>` is the folder that contains this `SKILL.md`. Then check the hero against [references/visual-system.md](references/visual-system.md), [references/views.md](references/views.md), and [references/realism.md](references/realism.md). A box grid, a chrome sphere, or a spinning primitive is a failed run.
+12. Tell the user: title, the object you modeled, its layers, **the view**, colors used, config path (`src/config/site.js`), and that copy is edited in `site.js` while the 3D object is edited in `subject.js`.
 
 ## What the page is
 
-The template already composes the stage. Your job is to fill the subject and the copy, not to restyle the overlays or rebuild the renderer. Read [references/visual-system.md](references/visual-system.md), [references/scene.md](references/scene.md), and [references/realism.md](references/realism.md) before writing files.
+The template already composes the stage. Your job is to fill the subject and the copy, **pick a named view**, and not restyle overlays by hand. Read [references/visual-system.md](references/visual-system.md), [references/views.md](references/views.md), [references/scene.md](references/scene.md), and [references/realism.md](references/realism.md) before writing files.
 
-- One fixed full-viewport WebGL canvas. Overlay UI in reserved zones: chrome, hero, left layer rail, right chapter panel, projected callouts, hint, colophon. An invisible 620vh `.scroll-track` is the only document flow.
+- One fixed full-viewport WebGL canvas. Overlay UI in reserved zones that **depend on the view**: chrome, hero, layer rail, chapter panel, projected callouts, hint, colophon. An invisible 620vh `.scroll-track` is the only document flow.
 - One named physical object, 4–7 layers, 150–400 meshes, canvas-printed details. No photographs, no GLTFs, no HDRIs.
 - One scroll scalar `p` drives camera, explosion, lights, and UI gates. See [references/choreography.md](references/choreography.md).
-- Palette is six hexes. CSS tokens and the light rig bind to them. You supply the hexes and the object, nothing else.
+- Palette is six hexes. View is one of five names. CSS tokens, the light rig, overlay layout, and camera bind to them. You supply the hexes, the view, and the object.
 
 ## Hard rules
 
 - Title is required. No title → ask and stop.
 - Name a real object before scaffolding. Abstract titles still get an artifact.
-- User-facing copy, colors, chapters, callouts, chrome live in `src/config/site.js` only.
+- Pick a named view. Do not invent a sixth overlay layout.
+- User-facing copy, colors, **view**, chapters, callouts, chrome live in `src/config/site.js` only.
 - The 3D object lives in `src/subject.js` + `src/textures.js`. Authored every run.
 - The palette must pass `scripts/check-palette.mjs`.
 - Import from `three` and `three/addons/...`. Never `three/webgpu`. Never TSL. Never `ShaderMaterial`.
@@ -64,6 +66,8 @@ The template already composes the stage. Your job is to fill the subject and the
 - Hardcoding a headline in `index.html` instead of `site.js`
 - Painting overlay backgrounds opaque so the canvas dies
 - Putting chapter copy on top of the subject (zones exist so you don't)
+- Shipping every title as `dossier` so a series of sites reads as one template
+- Restyling `.hero` / `.chapter` by hand instead of picking a named view
 - Inventing a complementary accent "for contrast" when the object is one chroma — that is the cyan cube on the orange keyboard
 - Reaching for a dark palette when the title cues a light one
 - Importing from `three/webgpu` or writing TSL
@@ -92,5 +96,6 @@ The template already composes the stage. Your job is to fill the subject and the
 | "I'll delete the floor to see the model better" | No shadow pool means it floats. Failed run. |
 | "I'll keep the keyboard and recolor it" | Wrong object. Rewrite `subject.js`. |
 | "Under 40 meshes is fine, it's stylized" | Under 40 is a sculpture. Failed run. |
+| "I'll leave view off, dossier is fine" | Pick from the object. `dossier` is a machine view, not a default skin. |
 
 **When the canvas is black, double-scrolling, or type sits on the subject:** [references/gotchas.md](references/gotchas.md) first.
